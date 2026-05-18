@@ -123,7 +123,7 @@ AI_MODEL=gemini-2.5-flash
 TEMPERATURE=0.7
 MAX_OUTPUT_TOKENS=1000
 
-FRONTEND_URL=http://localhost:5173 
+FRONTEND_URL=http://localhost:5173  
 
 👉 Hoặc tham khảo file .env.example    
 
