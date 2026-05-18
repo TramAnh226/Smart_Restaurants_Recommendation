@@ -96,14 +96,9 @@ Frontend chạy tại:
 http://localhost:5173   
 🔐 Environment Variables   
 
-Tạo file .env trong thư mục backend/:    
- 
-GEMINI_API_KEY=your_api_key    
-OPENWEATHER_API_KEY=your_api_key   
-DATABASE_URL=your_database_url   
-JWT_SECRET=your_secret_key   
+Tạo file .env trong thư mục backend/:      
 
-👉 Hoặc tham khảo file .env.example    
+👉 tham khảo file .env.example    
 
 🤖 AI Recommendation Logic    
 
