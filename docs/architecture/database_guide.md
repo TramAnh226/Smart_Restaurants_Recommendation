@@ -19,7 +19,7 @@ pip install supabase python-dotenv
 
 ### 0.2. Gửi truy vấn tới Supabase
 
-Để gửi truy vấn tới Supabase, cần 2 thứ: `SUPABASE_URL` và `SUPABASE_ANON_KEY`.
+Để gửi truy vấn tới Supabase, cần 2 thứ: `SUPABASE_URL` và `SUPABASE_KEY`.
 
 ```python
 import os
@@ -51,47 +51,60 @@ Trong hệ thống này, nhiều cột sử dụng kiểu **`jsonb`** thay vì `
 ## 1. Sơ Đồ Quan Hệ (ERD)
 
 ```
-┌──────────────────┐         ┌──────────────────────────┐
-│      users       │         │         favorites        │
-│──────────────────│         │──────────────────────────│
-│ id (PK)          │◄────────│ user_id (FK → users.id)  │
-│ email            │         │ menu_id (FK → menu.id)   │
-│ password         │         │ restaurant_id (FK)       │
-│ name             │         │ note                     │
-│ taste_preferences│         │ created_at               │
-│ allergy_prefs    │         └──────────────────────────┘
-│ preferred_...    │
-│ created_at       │         ┌──────────────────────────┐
-│ updated_at       │         │   recommendation_history │
-└──────────────────┘         │──────────────────────────│
-                             │ user_id (FK → users.id)  │
-┌──────────────────┐◄────────│ menu_id (FK → menu.id)   │
-│    restaurant    │◄────────│ restaurant_id (FK)       │
-│──────────────────│         │ context (jsonb)          │
-│ id (PK)          │         │ score                    │
-│ name             │         │ reason                   │
-│ address          │         │ action                   │
-│ rating           │         │ created_at               │
-│ review_count     │         └──────────────────────────┘
-│ opening_hours    │
-│ embedding_vector │◄────────────────────┐
-└──────────────────┘                     │
-         │                               │
-         │ 1:N                           │
-         ▼                               │
-┌──────────────────┐                     │
-│       menu       │─────────────────────┘
-│──────────────────│
-│ id (PK)          │
-│ restaurant_id(FK)│
-│ name             │
-│ price            │
-│ preview          │
-│ taste (jsonb)    │
-│ country_code     │
-│ style            │
-│ weather_code     │
-└──────────────────┘
+┌──────────────────────┐         ┌──────────────────────────┐
+│        users         │         │         favorites        │
+│──────────────────────│         │──────────────────────────│
+│ id (PK)              │◄────────│ user_id (FK → users.id)  │
+│ email                │         │ menu_id (FK → menu.id)   │
+│ password             │         │ restaurant_id (FK)       │
+│ name                 │         │ note                     │
+│ taste_preferences    │         │ created_at               │
+│ allergy_prefs        │         └──────────────────────────┘
+│ preferred_...        │
+│ recent_search_jobs   │         ┌──────────────────────────┐
+│ created_at           │         │   recommendation_history │
+│ updated_at           │         │──────────────────────────│
+└──────────────────────┘         │ user_id (FK → users.id)  │
+                                 │ menu_id (FK → menu.id)   │
+┌──────────────────────┐◄────────│ restaurant_id (FK)       │
+│      restaurant      │◄────────│ context                  │
+│──────────────────────│         │ score                    │
+│ id (PK)              │         │ reason                   │
+│ name                 │         │ action                   │
+│ address              │         │ created_at               │
+│ rating               │         └──────────────────────────┘
+│ review_count         │
+│ opening_hours        │
+│ latitude             │
+│ longitude            │
+│ price_lowest         │
+│ price_highest        │
+│ taste                │
+│ country_code         │
+│ style                │
+│ weather_code         │
+│ embedding_vector     │◄────────────────────┐
+└──────────────────────┘                     │
+         │                                   │
+         │                                   │
+         │                                   │
+         │                                   │
+         │                                   │
+         │ 1:N                               │
+         ▼                                   │
+┌──────────────────────┐                     │
+│         menu         │─────────────────────┘
+│──────────────────────│
+│ id (PK)              │
+│ restaurant_id(FK)    │
+│ name                 │
+│ price                │
+│ preview              │
+│ taste                │
+│ country_code         │
+│ style                │
+│ weather_code         │
+└──────────────────────┘
 ```
 
 ---
@@ -112,6 +125,14 @@ Lưu trữ thông tin của các quán ăn/nhà hàng được crawl từ Shopee
 | `rating` | `real` | ✓ | — | | Điểm đánh giá (0.0 – 5.0) | `4.5` |
 | `review_count` | `bigint` | ✓ | — | | Tổng số lượt đánh giá | `128` |
 | `opening_hours` | `jsonb` | ✓ | — | | Giờ mở cửa theo từng thứ | *(xem bên dưới)* |
+| `latitude` | `float8` | ✓ | — | | Vĩ độ địa lý của quán | `10.776889` |
+| `longitude` | `float8` | ✓ | — | | Kinh độ địa lý của quán | `106.700806` |
+| `price_lowest` | `int4` | ✓ | — | | Giá món rẻ nhất trong menu (VNĐ) | `25000` |
+| `price_highest` | `int4` | ✓ | — | | Giá món đắt nhất trong menu (VNĐ) | `150000` |
+| `taste` | `jsonb` | ✓ | — | | Mảng tổng hợp các vị từ menu (không trùng) | `["savory", "spicy"]` |
+| `country_code` | `jsonb` | ✓ | — | | Mảng tổng hợp quốc gia/ẩm thực từ menu | `["vietnamese"]` |
+| `style` | `jsonb` | ✓ | — | | Mảng tổng hợp phong cách từ menu | `["streetfood", "casual"]` |
+| `weather_code` | `jsonb` | ✓ | — | | Mảng tổng hợp thời tiết phù hợp từ menu | `["all", "hot"]` |
 | `embedding_vector` | `jsonb` | ✓ | — | | Vector nhúng phục vụ gợi ý AI | `[0.12, -0.34, ...]` |
 
 **Cấu trúc `opening_hours`:**
@@ -173,8 +194,35 @@ Lưu trữ thông tin tài khoản người dùng và các sở thích cá nhân
 | `allergy_preferences` | `jsonb` | ✓ | — | | Dị ứng thực phẩm | `["seafood"]` |
 | `preferred_countries` | `jsonb` | ✓ | — | | Ẩm thực yêu thích | `["vietnamese", "japanese"]` |
 | `preferred_styles` | `jsonb` | ✓ | — | | Phong cách ưa thích | `["casual", "streetfood"]` |
+| `recent_search_jobs` | `jsonb` | ✓ | — | | Lịch sử tìm kiếm gần đây | *(xem bên dưới)* |
 | `created_at` | `timestamptz` | ✗ | `now()` | | Thời điểm tạo tài khoản | `"2025-01-15T08:00:00Z"` |
 | `updated_at` | `timestamptz` | ✗ | `now()` | | Thời điểm cập nhật cuối | `"2025-05-01T12:00:00Z"` |
+
+**Cấu trúc `recent_search_jobs`** — mảng các lần tìm kiếm gần đây, mỗi phần tử là 1 job:
+```json
+[
+  {
+    "query": "bú bò Huế",
+    "filters": {
+      "taste": ["spicy", "savory"],
+      "style": "streetfood",
+      "budget_max": 80000
+    },
+    "searched_at": "2025-05-24T10:00:00Z"
+  },
+  {
+    "query": "cà phê sáng",
+    "filters": {
+      "style": "cafe",
+      "budget_max": 50000
+    },
+    "searched_at": "2025-05-24T09:30:00Z"
+  }
+]
+```
+
+> [!NOTE]
+> Đây chỉ là AI gợi ý, có thể thay đổi. Nên giới hạn array tối đa (ví dụ: 20 phần tử) ở tầng application để tránh `jsonb` phình to. Khi thêm mới, xóa phần tử cũ nhất nếu vượt giới hạn.
 
 ---
 
@@ -209,8 +257,10 @@ Ghi lại lịch sử các gợi ý đã được hệ thống AI đưa ra cho t
 | `context` | `jsonb` | ✓ | — | | Ngữ cảnh khi gợi ý (thời tiết, giờ...) | *(xem bên dưới)* |
 | `score` | `real` | ✓ | — | | Điểm số tương đồng/gợi ý (0.0–1.0) | `0.87` |
 | `reason` | `text` | ✓ | — | | Giải thích lý do gợi ý | `"Phù hợp vị cay, trời mưa"` |
-| `action` | `varchar` | ✓ | — | | Hành động của user với gợi ý | `"liked"`, `"dismissed"` |
+| `action` | `varchar` | ✓ | — | | Hành động của user với gợi ý | *(xem bên dưới)* |
 | `created_at` | `timestamptz` | ✓ | `now()` | | Thời điểm gợi ý được tạo | `"2025-05-20T12:00:00Z"` |
+
+**Các giá trị có thể có của `action`:** `"liked"`, `"dismissed"`, `"viewed"`, `"clicked"`, `"favorite"`, `"ordered"`, `"shared"`, `"dismissed"`
 
 **Cấu trúc `context`:**
 ```json
@@ -230,8 +280,8 @@ Cấu trúc trên do AI gợi ý và có thể thay đổi tùy theo tình hình
 
 | Bảng | Số Cột | Số Dòng (ước tính) | Mục Đích |
 | :--- | :---: | :---: | :--- |
-| `restaurant` | 7 | ~1,373 | Thông tin nhà hàng |
+| `restaurant` | 15 | ~1,373 | Thông tin nhà hàng (tọa độ, khoảng giá, & thuộc tính menu tổng hợp) |
 | `menu` | 9 | ~17,314 | Thực đơn & phân loại món ăn |
-| `users` | 10 | — | Tài khoản & sở thích người dùng |
+| `users` | 11 | — | Tài khoản, sở thích & lịch sử tìm kiếm |
 | `favorites` | 6 | — | Danh sách yêu thích |
 | `recommendation_history` | 9 | — | Lịch sử gợi ý của AI |
