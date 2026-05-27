@@ -62,3 +62,36 @@
   color: var(--text-primary);
   margin-bottom: var(--space-sm);
 }
+
+/* ── Filtered results flat grid ── */
+.filtered-results-header {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.filtered-results-header .section-title {
+  margin-bottom: 0;
+}
+
+.filtered-results-count {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-alpha, rgba(255, 107, 53, 0.12));
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+}
+
+.filtered-results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-lg);
+}
+
+@media (max-width: 480px) {
+  .filtered-results-grid {
+    grid-template-columns: 1fr;
+  }
+}

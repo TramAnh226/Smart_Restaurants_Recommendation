@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { getRestaurants } from '../services/supabase';
+import { useAuth } from '../hooks/useAuth';
 import { mockWeather, quickFilters } from '../data/mockData';
 import RestaurantCard from '../components/RestaurantCard';
 import WeatherCard from '../components/WeatherCard';
@@ -34,6 +35,8 @@ function loadFilters() {
 }
 
 export default function HomePage() {
+  const { user } = useAuth();
+
   // Restore cached filters on mount
   const cached = loadFilters();
 
@@ -45,6 +48,31 @@ export default function HomePage() {
   const [isAdvFilterOpen, setIsAdvFilterOpen] = useState(false);
   const [advFilters, setAdvFilters] = useState(cached?.advFilters || ADV_DEFAULT);
   const [userPos, setUserPos] = useState(null);
+
+  // Personalized recommendations from profile preferences
+  const [personalizedRecs, setPersonalizedRecs] = useState([]);
+  const [personalizedLoading, setPersonalizedLoading] = useState(false);
+
+  // Determine if any filter is active
+  const hasActiveFilters = !!(
+    activeFilter ||
+    advFilters.search ||
+    advFilters.maxDistance < 20 ||
+    advFilters.minRating > 0 ||
+    advFilters.maxPrice != null ||
+    advFilters.tastes.length > 0 ||
+    advFilters.styles.length > 0 ||
+    advFilters.contexts.length > 0 ||
+    advFilters.environments.length > 0
+  );
+
+  // Stable key for user preferences to avoid unnecessary re-fetches
+  const userPrefsKey = useMemo(() => JSON.stringify({
+    t: user?.taste_preferences || [],
+    s: user?.preferred_styles || [],
+    c: user?.preferred_contexts || [],
+    e: user?.preferred_environments || [],
+  }), [user?.taste_preferences, user?.preferred_styles, user?.preferred_contexts, user?.preferred_environments]);
 
   useEffect(() => {
     loadRestaurants();
@@ -103,6 +131,47 @@ export default function HomePage() {
     loadRestaurants(filters);
   }, [buildServerFilters]);
 
+  // Load personalized recommendations based on profile "Sở thích"
+  useEffect(() => {
+    // Only load personalized when no filters are active
+    if (hasActiveFilters) {
+      setPersonalizedRecs([]);
+      return;
+    }
+
+    const prefs = JSON.parse(userPrefsKey);
+    const hasTaste = prefs.t.length > 0;
+    const hasStyle = prefs.s.length > 0;
+    const hasContext = prefs.c.length > 0;
+    const hasEnv = prefs.e.length > 0;
+
+    if (!hasTaste && !hasStyle && !hasContext && !hasEnv) {
+      setPersonalizedRecs([]);
+      return;
+    }
+
+    const loadPersonalized = async () => {
+      setPersonalizedLoading(true);
+      try {
+        const filters = {};
+        if (hasTaste) filters.taste_tags = prefs.t;
+        if (hasStyle) filters.style_tags = prefs.s;
+        if (hasContext) filters.context_tags = prefs.c;
+        if (hasEnv) filters.environment_tags = prefs.e;
+
+        const data = await getRestaurants({ limit: 10, filters });
+        setPersonalizedRecs(data || []);
+      } catch (err) {
+        console.error('Failed to load personalized recs:', err);
+        setPersonalizedRecs([]);
+      } finally {
+        setPersonalizedLoading(false);
+      }
+    };
+
+    loadPersonalized();
+  }, [userPrefsKey, hasActiveFilters]);
+
   const handleFilterSelect = (filter) => {
     const next = activeFilter?.id === filter.id ? null : filter;
     setActiveFilter(next);
@@ -137,8 +206,8 @@ export default function HomePage() {
 
   const finalRestaurants = applyClientFilters(restaurants);
 
-  // Split restaurants into sections
-  const recommended = finalRestaurants.slice(0, 10);
+  // Default carousel sections (only used when no filters active)
+  const recommended = personalizedRecs.length > 0 ? personalizedRecs : finalRestaurants.slice(0, 10);
   const popular = finalRestaurants.filter((r) => r.rating >= 4.7).slice(0, 10);
   const budget = finalRestaurants.filter((r) => r.price_lowest && r.price_lowest <= 50000).slice(0, 10);
 
@@ -172,12 +241,41 @@ export default function HomePage() {
               <div key={i} className="skeleton" style={{ height: 260, borderRadius: 16 }} />
             ))}
           </div>
+        ) : hasActiveFilters ? (
+          /* ── Filtered view: flat grid ── */
+          <div className="filtered-results animate-fade-in">
+            <div className="filtered-results-header">
+              <h2 className="section-title">📋 Kết quả lọc</h2>
+              <span className="filtered-results-count">{finalRestaurants.length} quán</span>
+            </div>
+            {finalRestaurants.length > 0 ? (
+              <div className="filtered-results-grid">
+                {finalRestaurants.map((restaurant) => (
+                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                ))}
+              </div>
+            ) : (
+              <div className="no-results">
+                <h3>Không tìm thấy quán ăn phù hợp</h3>
+                <p>Thử điều chỉnh lại bộ lọc hoặc khoảng cách nhé!</p>
+              </div>
+            )}
+          </div>
         ) : (
+          /* ── Default view: categorized carousels ── */
           <>
-            <RecommendationCarousel
-              title="🔥 Gợi ý cho bạn"
-              restaurants={recommended}
-            />
+            {personalizedLoading ? (
+              <div className="home-loading" style={{ marginBottom: 'var(--space-xl)' }}>
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="skeleton" style={{ height: 260, borderRadius: 16 }} />
+                ))}
+              </div>
+            ) : (
+              <RecommendationCarousel
+                title="🔥 Gợi ý cho bạn"
+                restaurants={recommended}
+              />
+            )}
 
             {popular.length > 0 && (
               <RecommendationCarousel
