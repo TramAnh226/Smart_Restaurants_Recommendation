@@ -1,6 +1,5 @@
 """
 Ranking Module — M6
-Adapted from prototype: E:\\Code\\TDTT\\backend-20260508T150736Z-3-001\\backend\\modules\\ranking_module.py
 
 Nhiệm vụ:
 - Nhận danh sách restaurants đã scored từ M5 (scoring_module)
