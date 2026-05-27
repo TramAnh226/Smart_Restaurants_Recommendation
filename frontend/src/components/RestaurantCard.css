@@ -1,0 +1,112 @@
+.restaurant-card {
+  cursor: pointer;
+  min-width: 260px;
+  max-width: 320px;
+  flex-shrink: 0;
+  transition: all var(--transition-base);
+}
+
+.restaurant-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--card-shadow-hover);
+}
+
+.rc-image-wrapper {
+  position: relative;
+  width: 100%;
+  height: 160px;
+  overflow: hidden;
+  background: var(--bg-tertiary);
+}
+
+.rc-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.restaurant-card:hover .rc-image {
+  transform: scale(1.05);
+}
+
+.rc-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 3rem;
+  background: linear-gradient(135deg, var(--bg-tertiary), var(--card-border));
+}
+
+.rc-score-badge {
+  position: absolute;
+  top: var(--space-sm);
+  right: var(--space-sm);
+  background: var(--accent-gradient);
+  color: white;
+  font-weight: 700;
+  font-size: var(--font-sm);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  box-shadow: 0 2px 8px rgba(255, 107, 53, 0.4);
+}
+
+.rc-content {
+  padding: var(--space-md);
+}
+
+.rc-name {
+  font-size: var(--font-base);
+  font-weight: 700;
+  margin-bottom: var(--space-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.3;
+}
+
+.rc-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-sm);
+  font-size: var(--font-sm);
+}
+
+.rc-price {
+  color: var(--text-secondary);
+  font-size: var(--font-xs);
+}
+
+.rc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+  margin-bottom: var(--space-sm);
+}
+
+.rc-reason {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: var(--accent-light);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-xs);
+  color: var(--accent);
+  line-height: 1.4;
+}
+
+.rc-reason-icon {
+  flex-shrink: 0;
+}
+
+.rc-reason-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
