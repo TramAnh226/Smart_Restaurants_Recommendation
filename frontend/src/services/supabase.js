@@ -24,7 +24,7 @@ async function getRestaurantIdsByMenuTags({ taste_tags, style_tags } = {}) {
     const { data, error } = await supabase
       .from('menu')
       .select('restaurant_id')
-      .contains('taste_tags', taste_tags);
+      .contains('taste_tags', JSON.stringify(taste_tags));
     if (error) throw error;
     restaurantIds = new Set(data.map(m => m.restaurant_id));
   }
@@ -33,7 +33,7 @@ async function getRestaurantIdsByMenuTags({ taste_tags, style_tags } = {}) {
     const { data, error } = await supabase
       .from('menu')
       .select('restaurant_id')
-      .contains('style_tags', style_tags);
+      .contains('style_tags', JSON.stringify(style_tags));
     if (error) throw error;
     const styleIds = new Set(data.map(m => m.restaurant_id));
     // Intersect with taste results (if any)
@@ -77,14 +77,14 @@ export async function getRestaurants({ limit = 100, offset = 0, filters = {} } =
     query = query.in('id', idArray);
   }
 
-  // Filter theo context_tags (JSONB column — pass raw array, supabase-js handles serialization)
+  // Filter theo context_tags (JSONB column — must stringify for .contains())
   if (filters.context_tags && filters.context_tags.length > 0) {
-    query = query.contains('context_tags', filters.context_tags);
+    query = query.contains('context_tags', JSON.stringify(filters.context_tags));
   }
 
   // Filter theo environment_tags (JSONB column)
   if (filters.environment_tags && filters.environment_tags.length > 0) {
-    query = query.contains('environment_tags', filters.environment_tags);
+    query = query.contains('environment_tags', JSON.stringify(filters.environment_tags));
   }
 
   // Filter theo price range

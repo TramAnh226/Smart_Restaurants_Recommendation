@@ -13,8 +13,6 @@ export const mockUser = {
   allergy_preferences: [],
   preferred_countries: ['vietnamese', 'japanese'],
   preferred_styles: ['street_food', 'cafe'],
-  preferred_contexts: ['casual', 'study'],
-  preferred_environments: ['indoor', 'air_conditioned'],
 };
 
 // ===== MOCK WEATHER =====

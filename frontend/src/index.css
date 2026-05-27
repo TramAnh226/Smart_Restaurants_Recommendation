@@ -213,16 +213,6 @@ img {
   color: var(--accent);
 }
 
-.btn-outline {
-  background: transparent;
-  color: var(--accent);
-  border: 1.5px solid var(--accent);
-}
-
-.btn-outline:hover {
-  background: var(--accent-light);
-}
-
 .btn-icon {
   width: 40px;
   height: 40px;

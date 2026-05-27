@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { getMockChatResponse } from '../data/mockData';
 import ChatBox from '../components/ChatBox';
 import './ChatbotPage.css';

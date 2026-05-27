@@ -125,7 +125,7 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
             <label>💰 Mức giá tối đa</label>
             <select 
               value={filters.maxPrice || ''} 
-              onChange={(e) => handleChange('maxPrice', e.target.value ? Number(e.target.value) : null)}
+              onChange={(e) => handleChange('maxPrice', e.target.value ? Number(e.target.value) : '')}
               className="filter-select"
             >
               <option value="">Tất cả mức giá</option>

@@ -99,11 +99,11 @@ def generate_reasons(res: Dict, score: float) -> List[str]:
         elif distance <= 3.0:
             reasons.append(f"{prefix}Khoảng cách thuận tiện ({distance:.1f} km)")
 
-    # 6. Cuisine type — disabled: current DB only contains 'vietnamese', not useful as a reason
-    # cuisine = res.get("cuisine_type", [])
-    # if cuisine:
-    #     cuisine_str = ", ".join(cuisine)
-    #     reasons.append(f"{prefix}Ẩm thực {cuisine_str}")
+    # 6. Cuisine type (Supabase schema)
+    cuisine = res.get("cuisine_type", [])
+    if cuisine:
+        cuisine_str = ", ".join(cuisine)
+        reasons.append(f"{prefix}Ẩm thực {cuisine_str}")
 
     return reasons if reasons else ["Phù hợp với các tiêu chí lựa chọn của bạn"]
 

@@ -11,7 +11,6 @@ export default function RestaurantDetailPage() {
   const [menu, setMenu] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isFavorite, setIsFavorite] = useState(false);
-  // TODO (post-M1): persist to Supabase favorites table using real user_id
 
   useEffect(() => {
     loadData();
@@ -170,6 +169,7 @@ export default function RestaurantDetailPage() {
               lng={restaurant.longitude}
               name={restaurant.name}
               showUser={true}
+              showRoute={true}
               height={400}
             />
           </div>
