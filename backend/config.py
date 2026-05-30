@@ -1,22 +1,80 @@
-from dotenv import load_dotenv
-import os
+from pydantic_settings import BaseSettings
 
-load_dotenv()
 
-class Config:
+class Settings(BaseSettings):
 
-    HOST = os.getenv("HOST")
-    PORT = os.getenv("PORT")
+    # ======================
+    # Backend
+    # ======================
 
-    DB_HOST = os.getenv("DB_HOST")
-    DB_PORT = os.getenv("DB_PORT")
-    DB_NAME = os.getenv("DB_NAME")
-    DB_USER = os.getenv("DB_USER")
-    DB_PASSWORD = os.getenv("DB_PASSWORD")
+    HOST:str="0.0.0.0"
 
-    GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
-    WEATHER_API_KEY = os.getenv("WEATHER_API_KEY")
+    PORT:int=8000
 
-    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
-    TOP_K = int(os.getenv("TOP_K"))
+    # ======================
+    # Supabase
+    # ======================
+
+    SUPABASE_URL:str
+
+    SUPABASE_KEY:str
+
+
+    # ======================
+    # AI
+    # ======================
+
+    GEMINI_API_KEY:str
+
+    AI_MODEL:str="gemini-2.5-flash"
+
+    TEMPERATURE:float=0.7
+
+    MAX_OUTPUT_TOKENS:int=1000
+
+
+    # ======================
+    # Weather
+    # ======================
+
+    OPENWEATHER_API_KEY:str
+
+
+    # ======================
+    # Location
+    # ======================
+
+    OSM_BASE_URL:str=(
+        "https://nominatim.openstreetmap.org"
+    )
+
+
+    # ======================
+    # Recommendation
+    # ======================
+
+    TOP_K:int=5
+
+    DEFAULT_SCORE:float=5.0
+
+    MAX_DISTANCE_KM:int=20
+
+
+    # ======================
+    # Frontend
+    # ======================
+
+    FRONTEND_URL:str=(
+        "http://localhost:5173"
+    )
+
+
+    class Config:
+
+        env_file=".env"
+
+        case_sensitive=True
+
+
+settings=Settings()
