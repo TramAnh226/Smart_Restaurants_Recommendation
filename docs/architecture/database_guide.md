@@ -59,16 +59,16 @@ Trong hệ thống này, nhiều cột sử dụng kiểu **`jsonb`** thay vì `
 │        users         │         │         favorites        │
 │──────────────────────│         │──────────────────────────│
 │ id (PK)              │◄────────│ user_id (FK → users.id)  │
-│ email                │         │ menu_id (FK → menu.id)   │
-│ password             │         │ restaurant_id (FK)       │
-│ name                 │         │ favorite_type            │
-│ taste_preferences    │         │ note                     │
-│ allergy_prefs        │         │ created_at               │
-│ preferred_...        │         └──────────────────────────┘
-│ recent_search_jobs   │         ┌──────────────────────────┐
-│ created_at           │         │   recommendation_history │
-│ updated_at           │         │──────────────────────────│
-└──────────────────────┘         │ user_id (FK → users.id)  │
+│ name                 │         │ menu_id (FK → menu.id)   │
+│ taste_preferences    │         │ restaurant_id (FK)       │
+│ allergy_prefs        │         │ favorite_type            │
+│ preferred_...        │         │ note                     │
+│ recent_search_jobs   │         │ created_at               │
+│ created_at           │         └──────────────────────────┘
+│ updated_at           │         ┌──────────────────────────┐
+└──────────────────────┘         │   recommendation_history │
+                                 │──────────────────────────│
+                                 │ user_id (FK → users.id)  │
                                  │ menu_id (FK → menu.id)   │
 ┌──────────────────────┐◄────────│ restaurant_id (FK)       │
 │      restaurant      │◄────────│ context                  │
@@ -193,8 +193,6 @@ Lưu trữ thông tin tài khoản người dùng và các sở thích cá nhân
 | Tên Cột | Kiểu Dữ Liệu | Nullable | Mặc Định | Khóa | Mô Tả | Ví Dụ |
 | :--- | :--- | :---: | :--- | :---: | :--- | :--- |
 | `id` | `uuid` | ✗ | `gen_random_uuid()` | **PK** | ID định danh duy nhất | `"a1b2c3d4-..."` |
-| `email` | `varchar(255)` | ✗ | — | | Địa chỉ email (unique) | `"user@gmail.com"` |
-| `password` | `text` | ✗ | — | | Mật khẩu (đã hash) | `"$2b$10$..."` |
 | `name` | `varchar(255)` | ✓ | — | | Tên hiển thị | `"Nguyễn Văn A"` |
 | `taste_preferences` | `jsonb` | ✓ | — | | Sở thích vị giác | `["savory", "spicy"]` |
 | `allergy_preferences` | `jsonb` | ✓ | — | | Dị ứng thực phẩm | `["seafood"]` |
@@ -289,6 +287,6 @@ Cấu trúc trên do AI gợi ý và có thể thay đổi tùy theo tình hình
 | :--- | :---: | :---: | :--- |
 | `restaurant` | 16 | ~1,373 | Thông tin nhà hàng (tọa độ, khoảng giá, & thuộc tính menu tổng hợp) |
 | `menu` | 8 | ~17,314 | Thực đơn & phân loại món ăn |
-| `users` | 11 | — | Tài khoản, sở thích & lịch sử tìm kiếm |
+| `users` | 9 | — | Tài khoản, sở thích & lịch sử tìm kiếm |
 | `favorites` | 7 | — | Danh sách yêu thích |
 | `recommendation_history` | 9 | — | Lịch sử gợi ý của AI |
