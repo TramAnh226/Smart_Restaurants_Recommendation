@@ -1,0 +1,149 @@
+.detail-container {
+  max-width: 800px;
+}
+
+.detail-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  font-weight: 500;
+  margin-bottom: var(--space-lg);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.detail-back:hover {
+  color: var(--accent);
+}
+
+.detail-header {
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.detail-name {
+  font-size: var(--font-2xl);
+  font-weight: 800;
+  margin-bottom: var(--space-md);
+}
+
+.detail-meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-lg);
+  margin-bottom: var(--space-md);
+  flex-wrap: wrap;
+}
+
+.detail-price {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.detail-reviews {
+  color: var(--text-tertiary);
+  font-size: var(--font-sm);
+}
+
+.detail-address {
+  color: var(--text-secondary);
+  font-size: var(--font-sm);
+  margin-bottom: var(--space-md);
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+}
+
+.detail-fav-btn {
+  width: 100%;
+}
+
+.detail-section {
+  padding: var(--space-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.detail-section-title {
+  font-size: var(--font-lg);
+  font-weight: 700;
+  margin-bottom: var(--space-md);
+}
+
+.detail-hours {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.detail-hour-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-sm);
+}
+
+.detail-day {
+  text-transform: capitalize;
+  font-weight: 500;
+}
+
+.detail-time {
+  color: var(--text-secondary);
+}
+
+.detail-menu {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-md);
+  border-radius: var(--radius-md);
+  background: var(--bg-tertiary);
+  transition: background var(--transition-fast);
+}
+
+.menu-item:hover {
+  background: var(--accent-light);
+}
+
+.menu-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.menu-item-name {
+  font-weight: 500;
+}
+
+.menu-item-tags {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.menu-item-price {
+  font-weight: 700;
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+.detail-map-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-md);
+  padding: var(--space-xl);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  text-align: center;
+}

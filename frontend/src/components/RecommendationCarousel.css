@@ -1,0 +1,34 @@
+.rec-carousel {
+  margin-bottom: var(--space-2xl);
+}
+
+.rec-carousel-scroll {
+  display: flex;
+  gap: var(--space-lg);
+  overflow-x: auto;
+  padding-bottom: var(--space-md);
+  scroll-snap-type: x mandatory;
+}
+
+/* Tùy chỉnh thanh cuộn ngang cho đẹp (tùy chọn) */
+.rec-carousel-scroll::-webkit-scrollbar {
+  height: 8px;
+}
+
+.rec-carousel-scroll::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
+.rec-carousel-scroll::-webkit-scrollbar-thumb {
+  background: var(--card-border);
+  border-radius: 4px;
+}
+
+.rec-carousel-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+.rec-carousel-scroll > * {
+  scroll-snap-align: start;
+}

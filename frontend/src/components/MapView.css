@@ -1,0 +1,66 @@
+.map-view { border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--card-border); }
+.map-wrapper { position: relative; }
+.map-container { z-index: 1; }
+.leaflet-container { font-family: var(--font-family) !important; z-index: 1; }
+.leaflet-popup-content-wrapper { border-radius: var(--radius-md) !important; box-shadow: var(--card-shadow) !important; }
+.leaflet-popup-content { margin: 8px 12px !important; font-size: var(--font-sm) !important; line-height: 1.5 !important; }
+
+/* Marker containers */
+.nav-marker-container, .dest-marker-container, .route-arrow-container { background: none !important; border: none !important; }
+
+/* Pulsing ring */
+.user-pulse-ring { animation: pulseRing 2s ease-out infinite; }
+@keyframes pulseRing {
+  0% { stroke-opacity: 0.6; stroke-width: 2; }
+  50% { stroke-opacity: 0.2; stroke-width: 3; }
+  100% { stroke-opacity: 0.6; stroke-width: 2; }
+}
+
+/* Route arrows */
+.route-arrow { color: #FF6B35; font-size: 18px; font-weight: 900; text-shadow: 0 0 3px rgba(255,255,255,0.9); pointer-events: none; line-height: 1; }
+
+/* Custom controls */
+.map-custom-controls { position: absolute; top: 10px; left: 10px; z-index: 1000; display: flex; flex-direction: column; gap: 6px; }
+
+.map-ctrl-btn {
+  width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;
+  background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius-sm);
+  font-size: 1.1rem; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.15); transition: all var(--transition-fast);
+  color: var(--text-secondary);
+}
+.map-ctrl-btn:hover { background: var(--accent-light); color: var(--accent); transform: scale(1.05); }
+
+/* Recenter btn */
+.recenter-btn { border: 2px solid #4285F4; }
+.recenter-btn:hover { background: rgba(66,133,244,0.1); }
+.recenter-btn.active { background: rgba(255,107,53,0.1); border-color: #FF6B35; }
+
+
+.map-info-bar { display: flex; align-items: center; justify-content: space-between; gap: var(--space-md); padding: var(--space-md) var(--space-lg); background: var(--bg-secondary); border-top: 1px solid var(--card-border); font-size: var(--font-sm); }
+.map-info-left { display: flex; flex-direction: column; gap: 2px; }
+.map-route-info { color: var(--text-primary); font-size: var(--font-base); }
+.map-route-info strong { color: var(--accent); }
+.map-distance-hint { color: var(--text-tertiary); }
+.map-geo-note { color: var(--text-tertiary); font-size: var(--font-xs); }
+.map-info-actions { display: flex; gap: var(--space-sm); flex-shrink: 0; }
+.map-directions-btn { font-size: var(--font-sm) !important; padding: 0.5rem 1rem !important; }
+
+/* Directions panel */
+.map-directions-panel { background: var(--bg-secondary); border-top: 1px solid var(--card-border); padding: var(--space-lg); max-height: 300px; overflow-y: auto; animation: slideUp 0.3s ease-out; }
+.directions-title { font-size: var(--font-base); font-weight: 700; margin-bottom: var(--space-md); }
+.directions-list { display: flex; flex-direction: column; gap: var(--space-sm); }
+.direction-step { display: flex; align-items: flex-start; gap: var(--space-md); padding: var(--space-sm) var(--space-md); border-radius: var(--radius-sm); font-size: var(--font-sm); transition: background var(--transition-fast); }
+.direction-step:hover { background: var(--bg-tertiary); }
+.step-number { width: 24px; height: 24px; min-width: 24px; background: var(--accent-gradient); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: var(--font-xs); font-weight: 700; }
+.step-text { line-height: 1.5; color: var(--text-secondary); }
+.direction-arrive { background: var(--accent-light); border-radius: var(--radius-md); margin-top: var(--space-sm); }
+.direction-arrive .step-number { background: none; font-size: 1.1rem; }
+.direction-arrive .step-text { color: var(--accent); font-weight: 600; }
+
+@media (max-width: 768px) {
+  .map-info-bar { flex-direction: column; text-align: center; gap: var(--space-sm); padding: var(--space-md); }
+  .map-info-left { align-items: center; }
+  .map-directions-panel { max-height: 200px; }
+  .map-custom-controls { top: 6px; left: 6px; }
+  .map-ctrl-btn { width: 36px; height: 36px; font-size: 1rem; }
+}
