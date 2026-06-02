@@ -1,0 +1,108 @@
+{
+    "valid_tags": {
+        "taste": [
+            "spicy",
+            "sweet",
+            "savory",
+            "sour",
+            "bitter",
+            "umami",
+            "creamy",
+            "fresh",
+            "light",
+            "smoky",
+            "crispy",
+            "vegetarian"
+        ],
+        "context": [
+            "student_friendly",
+            "casual",
+            "date",
+            "group",
+            "family",
+            "study"
+        ],
+        "style": [
+            "street_food",
+            "fine_dining",
+            "cafe",
+            "rooftop",
+            "buffet"
+        ],
+        "environment": [
+            "indoor",
+            "outdoor",
+            "air_conditioned",
+            "rooftop",
+            "garden"
+        ],
+        "cuisine": [
+            "vietnamese",
+            "japanese",
+            "thai",
+            "korean",
+            "indian"
+        ],
+        "category": [
+            "noodle",
+            "rice",
+            "drink",
+            "dessert",
+            "snack",
+            "seafood"
+        ]
+    },
+    "keywords": {
+        "taste": {
+            "spicy": ["cay", "ớt", "sa tế", "satế", "mù tạt", "wasabi", "đồ cay", "tiêu", "tương ớt", "tê tê"],
+            "sweet": ["đường", "nhiều đường", "mật ong", "siro", "chè", "đồ ngọt", "bánh ngọt", "cốt dừa", "bánh kem", "trà sữa", "kẹo", "nước đường", "sữa đặc", "ngọt lịm", "ngọt thanh", "ngọt gắt", "ngọt xớt", "ngọt bùi", "ngọt ngào", "ngọt dịu"],
+            "savory": ["đậm đà", "đậm vị", "mặn", "hơi mặn", "mắm", "nước mắm", "vừa vặn", "vừa miệng", "hao cơm", "tốn cơm", "kho quẹt", "kho tiêu", "xào mặn"],
+            "sour": ["chua", "chanh", "giấm", "me", "đồ chua", "món chua"],
+            "bitter": ["đắng", "nhẫn", "nhặng", "chát", "đồ đắng", "món đắng"],
+            "umami": ["ngọt thịt", "ngọt xương", "ngọt nước", "mì chính", "bột ngọt", "umami", "ngọt tự nhiên", "ngọt thanh từ xương", "nước hầm xương", "ninh xương", "đậm đà từ thịt", "ngọt tôm"],
+            "creamy": ["béo", "ngậy", "phô mai", "cốt dừa", "sữa", "bùi", "kem cheese", "macchiato", "bơ", "sốt bơ", "sốt kem", "ngầy ngậy", "sệt sệt"],
+            "fresh": ["tươi", "thanh mát", "mát lạnh", "mọng nước", "thanh thanh", "thanh nhiệt", "mát ruột", "xanh tươi", "ngọt mát"],
+            "light": ["nhạt", "thanh đạm", "nhẹ vị", "không ngấy", "đỡ ngấy", "ít dầu mỡ", "healthy", "thanh tịnh", "lạt", "ăn kiêng", "eat clean", "ít đường", "ít mặn", "ít gia vị"],
+            "smoky": ["khói", "hun khói", "ám khói", "mùi nướng", "cháy cạnh", "nướng than", "xém lửa", "mùi khói", "khói than", "nướng củi", "xém xém", "xém mặt", "nướng xém", "nướng ngói", "nướng đá", "thơm mùi khói"],
+            "crispy": ["chiên", "rán", "giòn", "sần sật", "rồm rộp", "rôm rốp", "vỏ giòn", "đồ chiên", "đồ rán"],
+            "vegetarian": ["chay", "thuần chay", "không thịt", "kiêng mỡ", "kiêng động vật", "thanh đạm", "rau củ", "nấm", "đậu hũ", "đậu phụ", "gạo lứt", "thực vật", "giả mặn", "đồ chay", "cơm chay", "lẩu chay", "món chay", "thịt chay", "sườn non chay"]
+        },
+        "context": {
+            "student_friendly": ["học sinh", "sinh viên", "học viên", "hssv", "hạt dẻ", "giá rẻ", "bình dân", "vừa túi tiền", "hợp ví", "rẻ", "tiết kiệm", "giá tốt", "giá bèo", "giá mềm", "giá sinh viên", "chi phí thấp", "ngon bổ rẻ", "cuối tháng"],
+            "casual": ["vỉa hè", "lề đường", "la cà", "chém gió", "ăn vặt", "thoải mái", "bụi", "đường phố", "bình dân", "ngồi xổm", "trà đá", "lai rai", "bình dị", "lê la", "ngồi lề đường"],
+            "date": ["hẹn hò", "người yêu", "lãng mạn", "cầu hôn", "cặp đôi", "crush", "2 người", "tỏ tình", "couple", "gấu", "ny", "valentine", "tình nhân", "hâm nóng tình cảm"],
+            "group": ["nhóm", "bạn bè", "tụ tập", "đông người", "liên hoan", "tất niên", "họp lớp", "party", "rộng rãi", "đám bạn", "hội bạn", "hội chị em", "đồng nghiệp", "team building", "sức chứa lớn"],
+            "family": ["gia đình", "bố mẹ", "trẻ em", "con nít", "người lớn tuổi", "ghế em bé", "khu vui chơi", "sum họp", "ấm cúng", "người thân", "bữa cơm gia đình", "dẫn gia đình", "phù hợp cho gia đình"],
+            "study": ["học bài", "làm việc", "chạy deadline", "yên tĩnh", "ổ cắm", "wifi", "đọc sách", "cắm rễ", "work from home", "học nhóm", "không gian yên tĩnh", "tập trung"]
+        },
+        "style": {
+            "street_food": ["vỉa hè", "lề đường", "đường phố", "xe đẩy", "gánh hàng", "quán cóc", "ăn vặt", "chợ đêm", "ngồi bệt", "xiên bẩn", "hàng rong", "bình dân", "bình dị"],
+            "fine_dining": ["fine dining", "sang trọng", "cao cấp", "nhà hàng", "5 sao", "michelin", "hạng sang", "chanh sả", "sang chảnh", "đắt đỏ", "xa xỉ", "thượng lưu", "vip"],
+            "cafe": ["cafe", "cà phê", "coffee", "tiệm trà", "quán nước", "trà sữa", "quán trà", "phê pháo", "cf", "uống nước"],
+            "rooftop": ["rooftop", "sân thượng", "tầng thượng", "view cao", "ngắm thành phố", "trên cao", "tầng cao", "lầu cao", "skybar", "view xịn", "view toàn thành phố", "hóng gió trên cao", "view hoàng hôn", "tầng trên cùng"],
+            "buffet": ["buffet", "tự chọn", "ăn thỏa thích", "bao bụng", "gắp mỏi tay", "vé trọn gói", "ăn không giới hạn", "ăn thả ga"]
+        },
+        "environment": {
+            "indoor": ["trong nhà", "bên trong", "phòng kín", "không gian kín", "trong phòng", "có mái che", "ấm cúng", "kín đáo", "phòng riêng", "phòng máy lạnh", "tránh mưa"],
+            "outdoor": ["ngoài trời", "ngoài sân", "ngoài hiên", "ban công", "gió trời", "lộ thiên", "thoáng đãng", "vỉa hè", "thoáng mát", "ngoài đường", "sân trước", "sân sau", "không gian mở", "đón gió"],
+            "air_conditioned": ["máy lạnh", "phòng lạnh", "ngồi lạnh", "mát mẻ", "mát rượi", "điều hòa", "điều hoà", "có điều hoà", "phòng điều hòa", "có máy lạnh", "tránh nóng", "mát lạnh", "phà phà"],
+            "rooftop": ["rooftop", "sân thượng", "tầng thượng", "view cao", "ngắm thành phố", "trên cao", "tầng cao", "lầu cao", "skybar", "view xịn", "view toàn thành phố", "hóng gió trên cao", "view hoàng hôn", "tầng trên cùng"],
+            "garden": ["sân vườn", "nhiều cây", "cây xanh", "thiên nhiên", "rợp bóng", "vườn", "xanh mát", "mát mắt", "gần gũi thiên nhiên", "bóng cây", "cây cối", "tiểu cảnh"]
+        },
+        "cuisine": {
+            "vietnamese": ["việt nam", "món việt", "đồ việt", "ẩm thực việt", "thuần việt", "chuẩn việt", "hương vị việt", "quê hương", "đồng quê", "dân dã", "miền bắc", "miền trung", "miền nam", "tây bắc", "tây nam bộ", "phở", "bún chả", "bún bò", "bánh mì", "bánh mỳ", "gỏi cuốn", "cơm tấm", "bún đậu", "bánh xèo", "bánh cuốn", "cơm niêu", "lẩu mắm", "lẩu cua đồng", "bún riêu", "mì quảng"],
+            "japanese": ["nhật bản", "nhật", "món nhật", "đồ nhật", "ẩm thực nhật", "xứ hoa anh đào", "chuẩn nhật", "phong cách nhật", "izakaya", "omakase", "sushi", "sashimi", "ramen", "udon", "soba", "tempura", "takoyaki", "matcha", "wagyu", "bento", "wasabi", "miso", "kobe", "teri", "teriyaki", "tonkatsu", "mochi"],
+            "thai": ["thái lan", "đồ thái", "món thái", "ẩm thực thái", "xứ chùa vàng", "chuẩn thái", "hương vị thái", "tomyum", "tom yum", "pad thái", "pad thai", "som tum", "gỏi đu đủ", "lẩu thái", "trà thái", "chè thái", "xôi xoài", "gỏi thái", "mực thái", "sốt thái", "cà ri thái"],
+            "korean": ["hàn quốc", "món hàn", "đồ hàn", "ẩm thực hàn", "xứ kim chi", "style hàn", "chuẩn hàn", "quán hàn", "kim chi", "kimchi", "kimbap", "tokbokki", "tteokbokki", "tok", "samgyeopsal", "bulgogi", "bibimbap", "cơm trộn", "mì cay", "soju", "thịt nướng hàn", "panchan", "banchan", "gà rán hàn", "canh rong biển", "mì lạnh", "naengmyeon", "chả cá hàn"],
+            "indian": ["ấn độ", "món ấn", "đồ ấn", "ẩm thực ấn", "chuẩn ấn", "cà ri", "curry", "gà tikka", "tikka masala", "bánh naan", "samosa", "biryani", "tandoori", "masala", "cơm ấn", "trà sữa ấn"]
+        },
+        "category": {
+            "noodle": ["mì", "mỳ", "bún", "phở", "miến", "hủ tiếu", "hủ tíu", "bánh đa", "bánh canh", "nui", "ramen", "udon", "soba", "pasta", "spaghetti"],
+            "rice": ["cơm", "xôi", "gạo", "bibimbap", "bento"],
+            "drink": ["cafe", "cà phê", "cf", "bạc xỉu", "đen đá", "trà", "matcha", "macchiato", "hồng trà", "lục trà", "oolong", "nước ép", "sinh tố", "nước dừa", "nước mía", "nước cam", "detox", "smoothie", "bia", "rượu", "cocktail", "mocktail", "soju", "rượu vang", "nước ngọt", "coca", "pepsi", "đồ uống", "thức uống", "giải khát"],
+            "dessert": ["kem", "bingsu", "chè", "sữa chua", "yaourt", "tào phớ", "tàu hũ", "thạch", "pudding", "flan", "caramen", "tráng miệng", "bánh ngọt", "bánh kem", "macaron", "tiramisu", "cheesecake", "bánh tart", "bánh crepe", "bánh su", "mousse", "pancake", "trái cây", "hoa quả", "dưa hấu", "xoài", "trái cây dĩa"],
+            "snack": ["ăn vặt", "xiên bẩn", "cá viên", "bò viên", "xúc xích", "nem chua", "phô mai que", "khoai tây chiên", "khoai lang lắc", "bánh tráng", "bánh tráng trộn", "bánh tráng nướng", "khô gà", "khô bò", "khô mực", "bim bim", "snack", "hướng dương", "bắp rang", "popcorn", "đậu phộng", "đồ nhắm", "nhâm nhi"],
+            "seafood": ["hải sản", "đồ biển", "vựa hải sản", "tươi sống", "sứa", "tôm", "cá", "cua", "ghẹ", "mực", "bạch tuộc", "cồi mai", "ốc", "nghêu", "ngao", "sò", "hàu", "nhum", "bề bề"]
+        }
+    }
+}

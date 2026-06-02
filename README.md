@@ -96,36 +96,9 @@ Frontend chạy tại:
 http://localhost:5173   
 🔐 Environment Variables   
 
-Tạo file .env trong thư mục backend/:    
- 
-HOST=0.0.0.0
-PORT=5000
+Tạo file .env trong thư mục backend/:      
 
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=restaurant_db
-DB_USER=postgres
-DB_PASSWORD=abc123
-
-JWT_SECRET_KEY=my_secret_key
-
-GEMINI_API_KEY=AIza...
-
-WEATHER_API_KEY=xxxxx
-
-OSM_BASE_URL=https://nominatim.openstreetmap.org
-
-TOP_K=5
-DEFAULT_SCORE=5.0
-MAX_DISTANCE_KM=20
-
-AI_MODEL=gemini-2.5-flash
-TEMPERATURE=0.7
-MAX_OUTPUT_TOKENS=1000
-
-FRONTEND_URL=http://localhost:5173  
-
-👉 Hoặc tham khảo file .env.example    
+👉 tham khảo file .env.example    
 
 🤖 AI Recommendation Logic    
 

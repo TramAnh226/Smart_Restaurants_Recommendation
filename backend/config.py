@@ -19,4 +19,6 @@ class Config:
 
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 
+    AI_MODEL = os.getenv("AI_MODEL")
+
     TOP_K = int(os.getenv("TOP_K"))
