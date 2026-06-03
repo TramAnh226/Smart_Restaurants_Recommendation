@@ -41,9 +41,7 @@ export function AuthProvider({ children }) {
           console.log('[AuthContext] Default profile created successfully');
           return {
             ...defaultProfile,
-            email: authUser.email,
-            preferred_contexts: [],
-            preferred_environments: []
+            email: authUser.email
           };
         } else {
           throw error;
@@ -59,8 +57,8 @@ export function AuthProvider({ children }) {
         return {
           ...data,
           email: authUser.email,
-          preferred_contexts: localPrefs.preferred_contexts || [],
-          preferred_environments: localPrefs.preferred_environments || [],
+          allergy_preferences: data.allergy_preferences || [],
+          preferred_countries: data.preferred_countries || [],
         };
       }
     } catch (err) {
@@ -75,8 +73,10 @@ export function AuthProvider({ children }) {
         id: authUser.id,
         email: authUser.email,
         name: authUser.user_metadata?.name || authUser.email,
-        preferred_contexts: localPrefs.preferred_contexts || [],
-        preferred_environments: localPrefs.preferred_environments || [],
+        taste_preferences: [],
+        preferred_styles: [],
+        allergy_preferences: [],
+        preferred_countries: []
       };
     }
   };
@@ -190,9 +190,7 @@ export function AuthProvider({ children }) {
 
         const userObj = {
           ...defaultProfile,
-          email: data.user.email,
-          preferred_contexts: [],
-          preferred_environments: []
+          email: data.user.email
         };
         setUser(userObj);
         return { success: true, user: userObj };
@@ -217,15 +215,12 @@ export function AuthProvider({ children }) {
   const updateUser = async (updates) => {
     if (!user) return { success: false, error: 'Chưa đăng nhập' };
 
-    // Separate database fields from localStorage fields
-    const { preferred_contexts, preferred_environments, ...dbUpdates } = updates;
-
     try {
       let updatedData = {};
-      if (Object.keys(dbUpdates).length > 0) {
+      if (Object.keys(updates).length > 0) {
         const { data, error } = await supabase
           .from('users')
-          .update(dbUpdates)
+          .update(updates)
           .eq('id', user.id)
           .select()
           .single();
@@ -233,24 +228,11 @@ export function AuthProvider({ children }) {
         updatedData = data;
       }
 
-      // Save preferred_contexts and preferred_environments locally
-      const localPrefs = {};
-      if (preferred_contexts !== undefined) {
-        localPrefs.preferred_contexts = preferred_contexts;
-      }
-      if (preferred_environments !== undefined) {
-        localPrefs.preferred_environments = preferred_environments;
-      }
-      if (Object.keys(localPrefs).length > 0) {
-        const existing = JSON.parse(localStorage.getItem(`prefs_${user.id}`) || '{}');
-        localStorage.setItem(`prefs_${user.id}`, JSON.stringify({ ...existing, ...localPrefs }));
-      }
-
       const updatedUser = {
         ...user,
         ...updatedData,
-        preferred_contexts: preferred_contexts !== undefined ? preferred_contexts : user.preferred_contexts || [],
-        preferred_environments: preferred_environments !== undefined ? preferred_environments : user.preferred_environments || []
+        allergy_preferences: updatedData.allergy_preferences !== undefined ? updatedData.allergy_preferences : user.allergy_preferences || [],
+        preferred_countries: updatedData.preferred_countries !== undefined ? updatedData.preferred_countries : user.preferred_countries || []
       };
       setUser(updatedUser);
       return { success: true, user: updatedUser };
@@ -275,13 +257,12 @@ export function AuthProvider({ children }) {
         .eq('id', currentSession.user.id)
         .single();
       if (error) throw error;
-      const localPrefs = JSON.parse(localStorage.getItem(`prefs_${currentSession.user.id}`) || '{}');
       setUser((prev) => ({
         ...prev,
         ...data,
         email: currentSession.user.email,
-        preferred_contexts: localPrefs.preferred_contexts || [],
-        preferred_environments: localPrefs.preferred_environments || [],
+        allergy_preferences: data.allergy_preferences || [],
+        preferred_countries: data.preferred_countries || [],
       }));
     } catch (err) {
       console.error('refreshProfile error:', err);

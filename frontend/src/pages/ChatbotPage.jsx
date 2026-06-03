@@ -16,8 +16,8 @@ export default function ChatbotPage() {
   const [directPrefs, setDirectPrefs] = useState({
     taste_preferences: [],
     preferred_styles: [],
-    preferred_contexts: [],
-    preferred_environments: []
+    allergy_preferences: [],
+    preferred_countries: []
   });
 
   useEffect(() => {
@@ -26,16 +26,15 @@ export default function ChatbotPage() {
       try {
         const { data, error } = await supabase
           .from('users')
-          .select('taste_preferences, preferred_styles')
+          .select('taste_preferences, preferred_styles, allergy_preferences, preferred_countries')
           .eq('id', user.id)
           .single();
         if (!error && data) {
-          const localPrefs = JSON.parse(localStorage.getItem(`prefs_${user.id}`) || '{}');
           setDirectPrefs({
             taste_preferences: data.taste_preferences || [],
             preferred_styles: data.preferred_styles || [],
-            preferred_contexts: data.preferred_contexts || localPrefs.preferred_contexts || [],
-            preferred_environments: data.preferred_environments || localPrefs.preferred_environments || []
+            allergy_preferences: data.allergy_preferences || [],
+            preferred_countries: data.preferred_countries || []
           });
         }
       } catch (err) {
@@ -113,11 +112,8 @@ export default function ChatbotPage() {
         user_preferences: {
           taste_preferences: directPrefs.taste_preferences,
           preferred_styles: directPrefs.preferred_styles,
-          preferred_contexts: directPrefs.preferred_contexts,
-          preferred_environments: directPrefs.preferred_environments,
-          // Support legacy backend endpoints expecting tag suffixes:
-          taste_tags: directPrefs.taste_preferences,
-          style_tags: directPrefs.preferred_styles,
+          allergy_preferences: directPrefs.allergy_preferences,
+          preferred_countries: directPrefs.preferred_countries,
         },
         context,
       });

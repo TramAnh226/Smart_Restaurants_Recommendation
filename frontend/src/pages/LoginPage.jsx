@@ -55,7 +55,7 @@ export default function LoginPage() {
       } else {
         setError(translateError(result.error));
       }
-    } catch {
+    } catch (err) {
       setError('Đã có lỗi xảy ra');
     } finally {
       setLoading(false);

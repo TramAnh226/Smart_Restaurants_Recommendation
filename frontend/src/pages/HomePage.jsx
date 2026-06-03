@@ -70,8 +70,8 @@ export default function HomePage() {
   const [directPrefs, setDirectPrefs] = useState({
     taste_preferences: [],
     preferred_styles: [],
-    preferred_contexts: [],
-    preferred_environments: []
+    allergy_preferences: [],
+    preferred_countries: []
   });
 
   useEffect(() => {
@@ -84,13 +84,11 @@ export default function HomePage() {
           .eq('id', user.id)
           .single();
         if (!error && data) {
-          const localPrefs = JSON.parse(localStorage.getItem(`prefs_${user.id}`) || '{}');
           setDirectPrefs({
             taste_preferences: data.taste_preferences || [],
             preferred_styles: data.preferred_styles || [],
-            // Fallback for columns not yet present in users table schema
-            preferred_contexts: data.preferred_contexts || localPrefs.preferred_contexts || [],
-            preferred_environments: data.preferred_environments || localPrefs.preferred_environments || []
+            allergy_preferences: data.allergy_preferences || [],
+            preferred_countries: data.preferred_countries || []
           });
         }
       } catch (err) {
@@ -117,8 +115,8 @@ export default function HomePage() {
   const userPrefsKey = useMemo(() => JSON.stringify({
     t: directPrefs.taste_preferences,
     s: directPrefs.preferred_styles,
-    c: directPrefs.preferred_contexts,
-    e: directPrefs.preferred_environments,
+    a: directPrefs.allergy_preferences,
+    c: directPrefs.preferred_countries,
   }), [directPrefs]);
 
   useEffect(() => {
@@ -210,10 +208,10 @@ export default function HomePage() {
     const prefs = JSON.parse(userPrefsKey);
     const hasTaste = prefs.t.length > 0;
     const hasStyle = prefs.s.length > 0;
-    const hasContext = prefs.c.length > 0;
-    const hasEnv = prefs.e.length > 0;
+    const hasAllergy = prefs.a.length > 0;
+    const hasCountry = prefs.c.length > 0;
 
-    if (!hasTaste && !hasStyle && !hasContext && !hasEnv) {
+    if (!hasTaste && !hasStyle && !hasAllergy && !hasCountry) {
       setPersonalizedRecs([]);
       return;
     }
@@ -224,8 +222,8 @@ export default function HomePage() {
         const filters = {};
         if (hasTaste) filters.taste_tags = prefs.t;
         if (hasStyle) filters.style_tags = prefs.s;
-        if (hasContext) filters.context_tags = prefs.c;
-        if (hasEnv) filters.environment_tags = prefs.e;
+        if (hasAllergy) filters.allergy_preferences = prefs.a;
+        if (hasCountry) filters.preferred_countries = prefs.c;
 
         const data = await getRestaurants({ limit: 10, filters });
         setPersonalizedRecs(data || []);
