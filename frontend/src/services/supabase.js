@@ -54,25 +54,55 @@ async function getRestaurantIdsByMenuTags({ taste_tags, style_tags } = {}) {
  * then fetch those restaurants. This avoids the expensive JOIN that caused timeouts.
  */
 export async function getRestaurants({ limit = 100, offset = 0, filters = {} } = {}) {
-  // Step 1: If taste/style filters are active, get matching restaurant IDs from menu table
-  const menuFilterIds = await getRestaurantIdsByMenuTags({
-    taste_tags: filters.taste_tags,
-    style_tags: filters.style_tags,
-  });
+  const hasTaste = filters.taste_tags && filters.taste_tags.length > 0;
+  const hasStyle = filters.style_tags && filters.style_tags.length > 0;
 
-  // If menu filter returned an empty set, no restaurants match → return early
-  if (menuFilterIds && menuFilterIds.size === 0) {
-    return [];
+  let useDirectQuery = false;
+
+  // Query directly from restaurant table first if taste/style filters are active
+  if (hasTaste || hasStyle) {
+    try {
+      let testQuery = supabase.from('restaurant').select('id', { count: 'exact', head: true });
+      if (hasTaste) {
+        testQuery = testQuery.contains('taste_tags', JSON.stringify(filters.taste_tags));
+      }
+      if (hasStyle) {
+        testQuery = testQuery.contains('style_tags', JSON.stringify(filters.style_tags));
+      }
+      const { count, error } = await testQuery;
+      if (!error && count > 0) {
+        useDirectQuery = true;
+      }
+    } catch (err) {
+      console.warn('Direct query check failed, using 2-step fallback:', err);
+    }
   }
 
-  // Step 2: Query restaurant table with all filters
   let query = supabase
     .from('restaurant')
     .select('*')
     .order('rating', { ascending: false });
 
-  // Narrow to restaurants that matched menu-level tags
-  if (menuFilterIds) {
+  if (useDirectQuery) {
+    // Direct query
+    if (hasTaste) {
+      query = query.contains('taste_tags', JSON.stringify(filters.taste_tags));
+    }
+    if (hasStyle) {
+      query = query.contains('style_tags', JSON.stringify(filters.style_tags));
+    }
+  } else if (hasTaste || hasStyle) {
+    // 2-step fallback: Query menu table for matching restaurant IDs
+    const menuFilterIds = await getRestaurantIdsByMenuTags({
+      taste_tags: filters.taste_tags,
+      style_tags: filters.style_tags,
+    });
+
+    // If menu filter returned an empty set, no restaurants match → return early
+    if (menuFilterIds && menuFilterIds.size === 0) {
+      return [];
+    }
+
     const idArray = [...menuFilterIds];
     query = query.in('id', idArray);
   }

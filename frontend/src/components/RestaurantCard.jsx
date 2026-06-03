@@ -1,8 +1,8 @@
 import { useNavigate } from 'react-router-dom';
-import { contextLabel, envLabel } from '../utils/tagLabels';
+import { tasteLabel, contextLabel, envLabel } from '../utils/tagLabels';
 import './RestaurantCard.css';
 
-export default function RestaurantCard({ restaurant }) {
+export default function RestaurantCard({ restaurant, isFavorite, onToggleFavorite }) {
   const navigate = useNavigate();
 
   if (!restaurant) return null;
@@ -19,6 +19,9 @@ export default function RestaurantCard({ restaurant }) {
   const contextTags = restaurant.context_tags || [];
   const envTags = restaurant.environment_tags || [];
 
+  // Image fallback: cover_image -> preview -> placeholder
+  const imageSrc = restaurant.cover_image || restaurant.preview;
+
   return (
     <div
       className="restaurant-card card"
@@ -27,8 +30,21 @@ export default function RestaurantCard({ restaurant }) {
       tabIndex={0}
     >
       <div className="rc-image-wrapper">
-        {restaurant.preview ? (
-          <img src={restaurant.preview} alt={restaurant.name} className="rc-image" loading="lazy" />
+        {onToggleFavorite && (
+          <button
+            className={`rc-fav-badge ${isFavorite ? 'active' : ''}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleFavorite();
+            }}
+            aria-label={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
+          >
+            {isFavorite ? '❤️' : '🤍'}
+          </button>
+        )}
+        
+        {imageSrc ? (
+          <img src={imageSrc} alt={restaurant.name} className="rc-image" loading="lazy" />
         ) : (
           <div className="rc-image-placeholder">🍽️</div>
         )}
@@ -51,6 +67,9 @@ export default function RestaurantCard({ restaurant }) {
         </div>
 
         <div className="rc-tags">
+          {(restaurant.taste_tags || []).slice(0, 2).map((t) => (
+            <span key={t} className="tag tag-taste">{tasteLabel(t)}</span>
+          ))}
           {contextTags.slice(0, 2).map((t) => (
             <span key={t} className="tag tag-context">{contextLabel(t)}</span>
           ))}
@@ -69,3 +88,4 @@ export default function RestaurantCard({ restaurant }) {
     </div>
   );
 }
+

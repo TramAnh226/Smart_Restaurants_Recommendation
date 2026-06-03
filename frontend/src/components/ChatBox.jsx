@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import RestaurantCard from './RestaurantCard';
 import './ChatBox.css';
 
-export default function ChatBox({ messages, onSend }) {
+export default function ChatBox({ messages, onSend, isFavorite, onToggleFavorite }) {
   const [input, setInput] = useState('');
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -28,7 +29,21 @@ export default function ChatBox({ messages, onSend }) {
           >
             <div className="chatbox-bubble">
               {msg.role === 'assistant' && <span className="chatbox-avatar">🤖</span>}
-              <div className="chatbox-text">{msg.content}</div>
+              <div className="chatbox-text">
+                <div>{msg.content}</div>
+                {msg.restaurants && msg.restaurants.length > 0 && (
+                  <div className="chatbox-restaurants">
+                    {msg.restaurants.map((res) => (
+                      <RestaurantCard
+                        key={res.id}
+                        restaurant={res}
+                        isFavorite={isFavorite ? isFavorite(res.id) : false}
+                        onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(res.id) : undefined}
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
               {msg.role === 'user' && <span className="chatbox-avatar">👤</span>}
             </div>
           </div>

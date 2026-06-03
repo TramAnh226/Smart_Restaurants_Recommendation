@@ -1,83 +1,309 @@
-import { createContext, useState, useEffect } from 'react';
-import { mockUser } from '../data/mockData';
+import { createContext, useState, useEffect, useRef } from 'react';
+import { supabase } from '../services/supabase';
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [token, setToken] = useState(null);
+  const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const lastUserId = useRef(null);
+
+  const fetchUserProfile = async (authUser) => {
+    console.log('[AuthContext] fetchUserProfile started for:', authUser?.email);
+    try {
+      console.log('[AuthContext] Querying users table...');
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authUser.id)
+        .single();
+
+      if (error) {
+        console.warn('[AuthContext] users query returned error:', error);
+        if (error.code === 'PGRST116') { // Row not found
+          console.log('[AuthContext] User row not found, creating default profile...');
+          const defaultProfile = {
+            id: authUser.id,
+            name: authUser.user_metadata?.name || authUser.email.split('@')[0],
+            taste_preferences: [],
+            preferred_styles: [],
+            allergy_preferences: [],
+            preferred_countries: []
+          };
+          const { error: insertError } = await supabase
+            .from('users')
+            .upsert(defaultProfile);
+          if (insertError) {
+            console.error('[AuthContext] default profile upsert failed:', insertError);
+            throw insertError;
+          }
+          console.log('[AuthContext] Default profile created successfully');
+          return {
+            ...defaultProfile,
+            email: authUser.email,
+            preferred_contexts: [],
+            preferred_environments: []
+          };
+        } else {
+          throw error;
+        }
+      } else {
+        console.log('[AuthContext] User profile fetched successfully:', data);
+        let localPrefs = {};
+        try {
+          localPrefs = JSON.parse(localStorage.getItem(`prefs_${authUser.id}`) || '{}');
+        } catch (e) {
+          console.error('Error parsing local preferences:', e);
+        }
+        return {
+          ...data,
+          email: authUser.email,
+          preferred_contexts: localPrefs.preferred_contexts || [],
+          preferred_environments: localPrefs.preferred_environments || [],
+        };
+      }
+    } catch (err) {
+      console.error('Error fetching user profile inside fetchUserProfile catch:', err);
+      let localPrefs = {};
+      try {
+        localPrefs = JSON.parse(localStorage.getItem(`prefs_${authUser.id}`) || '{}');
+      } catch (e) {
+        console.error('Error parsing local preferences in catch:', e);
+      }
+      return {
+        id: authUser.id,
+        email: authUser.email,
+        name: authUser.user_metadata?.name || authUser.email,
+        preferred_contexts: localPrefs.preferred_contexts || [],
+        preferred_environments: localPrefs.preferred_environments || [],
+      };
+    }
+  };
 
   useEffect(() => {
-    // Check localStorage for existing session
-    const savedToken = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (savedToken && savedUser) {
-      setToken(savedToken);
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    let active = true;
+    console.log('[AuthContext] useEffect mounted. active = true');
+
+    const handleSessionChange = async (currentSession) => {
+      if (!active) return;
+
+      setSession(currentSession);
+      const currentUserId = currentSession?.user?.id || null;
+
+      if (currentUserId !== lastUserId.current) {
+        lastUserId.current = currentUserId;
+
+        if (currentSession?.user) {
+          // Set loading to false immediately so the user can enter the app
+          setLoading(false);
+
+          // Fetch user profile in the background
+          try {
+            const profile = await fetchUserProfile(currentSession.user);
+            if (active && lastUserId.current === currentUserId) {
+              setUser(profile);
+            }
+          } catch (err) {
+            console.error('[AuthContext] Background profile fetch failed:', err);
+          }
+        } else {
+          setUser(null);
+          setLoading(false);
+        }
+      } else {
+        // Same user ID, session already processed. Make sure loading is false.
+        setLoading(false);
+      }
+    };
+
+    // Get initial session
+    console.log('[AuthContext] Calling supabase.auth.getSession()...');
+    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+      console.log('[AuthContext] getSession resolved, session exists:', !!initialSession);
+      handleSessionChange(initialSession);
+    }).catch(err => {
+      console.error('[AuthContext] getSession failed:', err);
+      if (active) setLoading(false);
+    });
+
+    // Listen for auth changes
+    console.log('[AuthContext] Registering onAuthStateChange...');
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, currentSession) => {
+      console.log('[AuthContext] onAuthStateChange event fired:', event, 'session exists:', !!currentSession);
+      handleSessionChange(currentSession);
+    });
+
+    return () => {
+      console.log('[AuthContext] useEffect cleanup. setting active = false');
+      active = false;
+      subscription?.unsubscribe();
+    };
   }, []);
 
   const login = async (email, password) => {
-    // TODO: Replace with real M1 API call POST /api/auth/login
-    // For now, use mock auth
     try {
-      // Simulate API delay
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
 
-      // Mock successful login
-      const mockToken = 'mock_jwt_token_' + Date.now();
-      const userData = { ...mockUser, email };
-
-      setToken(mockToken);
-      setUser(userData);
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(userData));
-
-      return { success: true, user: userData };
+      if (data?.user) {
+        const profile = await fetchUserProfile(data.user);
+        setUser(profile);
+        return { success: true, user: profile };
+      }
+      return { success: false, error: 'Đăng nhập không thành công' };
     } catch (error) {
       return { success: false, error: error.message };
     }
   };
 
   const register = async (email, password, name) => {
-    // TODO: Replace with real M1 API call POST /api/auth/register
     try {
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name },
+        },
+      });
+      if (error) throw error;
 
-      const mockToken = 'mock_jwt_token_' + Date.now();
-      const userData = { ...mockUser, email, name };
+      if (data?.user) {
+        const defaultProfile = {
+          id: data.user.id,
+          name: name || email.split('@')[0],
+          taste_preferences: [],
+          preferred_styles: [],
+          allergy_preferences: [],
+          preferred_countries: []
+        };
 
-      setToken(mockToken);
-      setUser(userData);
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(userData));
+        const { error: dbError } = await supabase
+          .from('users')
+          .upsert(defaultProfile);
+        if (dbError) {
+          console.error("Database user profile creation failed:", dbError);
+        }
 
-      return { success: true, user: userData };
+        const userObj = {
+          ...defaultProfile,
+          email: data.user.email,
+          preferred_contexts: [],
+          preferred_environments: []
+        };
+        setUser(userObj);
+        return { success: true, user: userObj };
+      }
+      return { success: false, error: 'Đăng ký không thành công' };
     } catch (error) {
       return { success: false, error: error.message };
     }
   };
 
-  const logout = () => {
-    setToken(null);
-    setUser(null);
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+      setSession(null);
+    } catch (error) {
+      console.error('Logout error:', error.message);
+    }
   };
 
-  const updateUser = (updates) => {
-    const updated = { ...user, ...updates };
-    setUser(updated);
-    localStorage.setItem('user', JSON.stringify(updated));
+  const updateUser = async (updates) => {
+    if (!user) return { success: false, error: 'Chưa đăng nhập' };
+
+    // Separate database fields from localStorage fields
+    const { preferred_contexts, preferred_environments, ...dbUpdates } = updates;
+
+    try {
+      let updatedData = {};
+      if (Object.keys(dbUpdates).length > 0) {
+        const { data, error } = await supabase
+          .from('users')
+          .update(dbUpdates)
+          .eq('id', user.id)
+          .select()
+          .single();
+        if (error) throw error;
+        updatedData = data;
+      }
+
+      // Save preferred_contexts and preferred_environments locally
+      const localPrefs = {};
+      if (preferred_contexts !== undefined) {
+        localPrefs.preferred_contexts = preferred_contexts;
+      }
+      if (preferred_environments !== undefined) {
+        localPrefs.preferred_environments = preferred_environments;
+      }
+      if (Object.keys(localPrefs).length > 0) {
+        const existing = JSON.parse(localStorage.getItem(`prefs_${user.id}`) || '{}');
+        localStorage.setItem(`prefs_${user.id}`, JSON.stringify({ ...existing, ...localPrefs }));
+      }
+
+      const updatedUser = {
+        ...user,
+        ...updatedData,
+        preferred_contexts: preferred_contexts !== undefined ? preferred_contexts : user.preferred_contexts || [],
+        preferred_environments: preferred_environments !== undefined ? preferred_environments : user.preferred_environments || []
+      };
+      setUser(updatedUser);
+      return { success: true, user: updatedUser };
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      return { success: false, error: error.message };
+    }
+  };
+
+  /**
+   * Re-fetch user profile directly from the users table.
+   * Call this on page mount to pick up preference changes
+   * made from another device or browser tab.
+   */
+  const refreshProfile = async () => {
+    const { data: { session: currentSession } } = await supabase.auth.getSession();
+    if (!currentSession?.user) return;
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', currentSession.user.id)
+        .single();
+      if (error) throw error;
+      const localPrefs = JSON.parse(localStorage.getItem(`prefs_${currentSession.user.id}`) || '{}');
+      setUser((prev) => ({
+        ...prev,
+        ...data,
+        email: currentSession.user.email,
+        preferred_contexts: localPrefs.preferred_contexts || [],
+        preferred_environments: localPrefs.preferred_environments || [],
+      }));
+    } catch (err) {
+      console.error('refreshProfile error:', err);
+    }
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, token, loading, login, register, logout, updateUser, isAuthenticated: !!token }}
+      value={{
+        user,
+        token: session?.access_token || null,
+        loading,
+        login,
+        register,
+        logout,
+        updateUser,
+        refreshProfile,
+        isAuthenticated: !!session,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
+

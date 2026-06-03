@@ -3,19 +3,7 @@
  * Dùng khi chưa có API từ M1/M2
  */
 
-// ===== MOCK USER =====
-export const mockUser = {
-  id: 'user_001',
-  username: 'demo_user',
-  email: 'demo@gmail.com',
-  name: 'Nguyễn Văn Demo',
-  taste_preferences: ['spicy', 'savory'],
-  allergy_preferences: [],
-  preferred_countries: ['vietnamese', 'japanese'],
-  preferred_styles: ['street_food', 'cafe'],
-  preferred_contexts: ['casual', 'group'],
-  preferred_environments: ['indoor', 'air_conditioned'],
-};
+
 
 // ===== MOCK WEATHER =====
 export const mockWeather = {
@@ -68,8 +56,6 @@ export const quickFilters = [
   { id: 'quiet', label: '🤫 Yên tĩnh', environment_tags: ['quiet'] },
 ];
 
-// ===== MOCK FAVORITES (khi chưa có API) =====
-export const mockFavorites = [];
 
 /**
  * Giả lập chat response

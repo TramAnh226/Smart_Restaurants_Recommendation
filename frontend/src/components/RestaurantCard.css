@@ -110,3 +110,33 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+.rc-fav-badge {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  background: var(--bg-card);
+  border: 1px solid var(--card-border);
+  color: var(--text-primary);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 0;
+  font-size: var(--font-sm);
+  z-index: 10;
+}
+
+.rc-fav-badge:hover {
+  transform: scale(1.1);
+}
+
+.rc-fav-badge.active {
+  background: rgba(255, 107, 53, 0.1);
+  border-color: var(--accent);
+}

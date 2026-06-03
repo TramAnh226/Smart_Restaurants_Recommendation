@@ -83,3 +83,22 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+
+.chatbox-restaurants {
+  display: flex;
+  overflow-x: auto;
+  gap: var(--space-md);
+  padding: var(--space-sm) var(--space-xs);
+  margin-top: var(--space-md);
+  scrollbar-width: thin;
+  width: 100%;
+}
+
+.chatbox-restaurants .restaurant-card {
+  width: 240px;
+  min-width: 240px;
+  max-width: 240px;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+

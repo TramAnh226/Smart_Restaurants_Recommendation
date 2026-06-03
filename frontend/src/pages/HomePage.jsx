@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { getRestaurants } from '../services/supabase';
+import { getRestaurants, supabase } from '../services/supabase';
 import { useAuth } from '../hooks/useAuth';
-import { mockWeather, quickFilters } from '../data/mockData';
+import { useFavorites } from '../hooks/useFavorites';
+import { getWeather } from '../services/api';
+import { quickFilters } from '../data/mockData';
 import RestaurantCard from '../components/RestaurantCard';
 import WeatherCard from '../components/WeatherCard';
 import QuickFilterBar from '../components/QuickFilterBar';
@@ -24,7 +26,7 @@ const ADV_DEFAULT = {
 // SessionStorage helpers — persist filters across page navigation
 const FILTER_KEY = 'home_filters';
 function saveFilters(quickFilter, advFilters) {
-  try { sessionStorage.setItem(FILTER_KEY, JSON.stringify({ quickFilter, advFilters })); } catch {}
+  try { sessionStorage.setItem(FILTER_KEY, JSON.stringify({ quickFilter, advFilters })); } catch { }
 }
 function loadFilters() {
   try {
@@ -35,7 +37,18 @@ function loadFilters() {
 }
 
 export default function HomePage() {
-  const { user } = useAuth();
+  const { user, refreshProfile } = useAuth();
+  const { isFavorite, addFavorite, removeFavorite } = useFavorites();
+  const [weather, setWeather] = useState(null);
+  const [weatherLoading, setWeatherLoading] = useState(true);
+
+  const handleToggleFavorite = async (restaurantId) => {
+    if (isFavorite(restaurantId)) {
+      await removeFavorite(restaurantId);
+    } else {
+      await addFavorite(restaurantId);
+    }
+  };
 
   // Restore cached filters on mount
   const cached = loadFilters();
@@ -43,7 +56,7 @@ export default function HomePage() {
   const [restaurants, setRestaurants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeFilter, setActiveFilter] = useState(cached?.quickFilter || null);
-  
+
   // Advanced Filter state
   const [isAdvFilterOpen, setIsAdvFilterOpen] = useState(false);
   const [advFilters, setAdvFilters] = useState(cached?.advFilters || ADV_DEFAULT);
@@ -52,6 +65,40 @@ export default function HomePage() {
   // Personalized recommendations from profile preferences
   const [personalizedRecs, setPersonalizedRecs] = useState([]);
   const [personalizedLoading, setPersonalizedLoading] = useState(false);
+
+  // Direct preferences loaded directly from the 'users' table in Supabase
+  const [directPrefs, setDirectPrefs] = useState({
+    taste_preferences: [],
+    preferred_styles: [],
+    preferred_contexts: [],
+    preferred_environments: []
+  });
+
+  useEffect(() => {
+    const fetchPrefsDirectly = async () => {
+      if (!user?.id) return;
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+        if (!error && data) {
+          const localPrefs = JSON.parse(localStorage.getItem(`prefs_${user.id}`) || '{}');
+          setDirectPrefs({
+            taste_preferences: data.taste_preferences || [],
+            preferred_styles: data.preferred_styles || [],
+            // Fallback for columns not yet present in users table schema
+            preferred_contexts: data.preferred_contexts || localPrefs.preferred_contexts || [],
+            preferred_environments: data.preferred_environments || localPrefs.preferred_environments || []
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch user preferences directly from Supabase users table:', err);
+      }
+    };
+    fetchPrefsDirectly();
+  }, [user?.id]);
 
   // Determine if any filter is active
   const hasActiveFilters = !!(
@@ -68,15 +115,18 @@ export default function HomePage() {
 
   // Stable key for user preferences to avoid unnecessary re-fetches
   const userPrefsKey = useMemo(() => JSON.stringify({
-    t: user?.taste_preferences || [],
-    s: user?.preferred_styles || [],
-    c: user?.preferred_contexts || [],
-    e: user?.preferred_environments || [],
-  }), [user?.taste_preferences, user?.preferred_styles, user?.preferred_contexts, user?.preferred_environments]);
+    t: directPrefs.taste_preferences,
+    s: directPrefs.preferred_styles,
+    c: directPrefs.preferred_contexts,
+    e: directPrefs.preferred_environments,
+  }), [directPrefs]);
 
   useEffect(() => {
+    // Re-fetch user prefs from DB on mount to pick up changes from other devices/tabs
+    refreshProfile();
+
     loadRestaurants();
-    
+
     // Request geolocation for distance filtering
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -88,27 +138,45 @@ export default function HomePage() {
     }
   }, []);
 
+  // Load weather when userPos or component mounts
+  useEffect(() => {
+    const fetchWeather = async () => {
+      setWeatherLoading(true);
+      try {
+        const lat = userPos?.lat || 10.776;
+        const lng = userPos?.lng || 106.70;
+        const data = await getWeather(lat, lng);
+        setWeather(data);
+      } catch (err) {
+        console.error('Failed to load weather:', err);
+      } finally {
+        setWeatherLoading(false);
+      }
+    };
+    fetchWeather();
+  }, [userPos]);
+
   // Re-fetch when advanced filters with server-side fields change
   // (taste_tags, style_tags, context_tags, environment_tags, price)
   const buildServerFilters = useCallback(() => {
     const serverFilters = {};
-    
+
     // Quick filter (already has context_tags, environment_tags, max_price)
     if (activeFilter) {
       Object.assign(serverFilters, activeFilter);
     }
-    
+
     // Advanced filter — taste/style go to server (menu table lookup)
     if (advFilters.tastes?.length > 0) serverFilters.taste_tags = advFilters.tastes;
     if (advFilters.styles?.length > 0) serverFilters.style_tags = advFilters.styles;
-    
+
     // Advanced filter — context/environment override quick filter if set
     if (advFilters.contexts?.length > 0) serverFilters.context_tags = advFilters.contexts;
     if (advFilters.environments?.length > 0) serverFilters.environment_tags = advFilters.environments;
-    
+
     // Advanced filter — price overrides quick filter if set
     if (advFilters.maxPrice) serverFilters.max_price = advFilters.maxPrice;
-    
+
     return serverFilters;
   }, [activeFilter, advFilters]);
 
@@ -189,17 +257,17 @@ export default function HomePage() {
     return list.filter((r) => {
       // 1. Search name
       if (advFilters.search && !r.name.toLowerCase().includes(advFilters.search.toLowerCase())) return false;
-      
+
       // 2. Rating
       if (advFilters.minRating > 0 && r.rating < advFilters.minRating) return false;
-      
+
       // 3. Distance (only if userPos is available and maxDistance < 20)
       if (userPos && advFilters.maxDistance < 20) {
         if (!r.latitude || !r.longitude) return false;
         const dist = calcDistance(userPos.lat, userPos.lng, r.latitude, r.longitude);
         if (dist > advFilters.maxDistance) return false;
       }
-      
+
       return true;
     });
   };
@@ -219,7 +287,11 @@ export default function HomePage() {
           <p className="home-subtext">Khám phá quán ăn phù hợp nhất với bạn</p>
         </div>
 
-        <WeatherCard weather={mockWeather} />
+        {weatherLoading ? (
+          <div className="skeleton" style={{ height: 80, borderRadius: 16, marginBottom: 'var(--space-xl)' }} />
+        ) : (
+          <WeatherCard weather={weather} />
+        )}
 
         <div className="filter-bar-container">
           <QuickFilterBar
@@ -227,8 +299,8 @@ export default function HomePage() {
             activeFilter={activeFilter}
             onSelect={handleFilterSelect}
           />
-          <button 
-            className="btn btn-secondary adv-filter-btn" 
+          <button
+            className="btn btn-secondary adv-filter-btn"
             onClick={() => setIsAdvFilterOpen(true)}
           >
             ⚙️ Lọc
@@ -251,7 +323,12 @@ export default function HomePage() {
             {finalRestaurants.length > 0 ? (
               <div className="filtered-results-grid">
                 {finalRestaurants.map((restaurant) => (
-                  <RestaurantCard key={restaurant.id} restaurant={restaurant} />
+                  <RestaurantCard
+                    key={restaurant.id}
+                    restaurant={restaurant}
+                    isFavorite={isFavorite(restaurant.id)}
+                    onToggleFavorite={() => handleToggleFavorite(restaurant.id)}
+                  />
                 ))}
               </div>
             ) : (
@@ -274,6 +351,8 @@ export default function HomePage() {
               <RecommendationCarousel
                 title="🔥 Gợi ý cho bạn"
                 restaurants={recommended}
+                isFavorite={isFavorite}
+                onToggleFavorite={handleToggleFavorite}
               />
             )}
 
@@ -281,6 +360,8 @@ export default function HomePage() {
               <RecommendationCarousel
                 title="⭐ Phổ biến nhất"
                 restaurants={popular}
+                isFavorite={isFavorite}
+                onToggleFavorite={handleToggleFavorite}
               />
             )}
 
@@ -288,9 +369,11 @@ export default function HomePage() {
               <RecommendationCarousel
                 title="💰 Ngon - Bổ - Rẻ (dưới 50k)"
                 restaurants={budget}
+                isFavorite={isFavorite}
+                onToggleFavorite={handleToggleFavorite}
               />
             )}
-            
+
             {recommended.length === 0 && popular.length === 0 && budget.length === 0 && (
               <div className="no-results">
                 <h3>Không tìm thấy quán ăn phù hợp</h3>
@@ -300,7 +383,7 @@ export default function HomePage() {
           </>
         )}
 
-        <AdvancedFilterModal 
+        <AdvancedFilterModal
           isOpen={isAdvFilterOpen}
           onClose={() => setIsAdvFilterOpen(false)}
           initialFilters={advFilters}

@@ -10,10 +10,24 @@ export default function ProfilePage() {
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [tastes, setTastes] = useState(user?.taste_preferences || []);
-  const [styles, setStyles] = useState(user?.preferred_styles || []);
-  const [contexts, setContexts] = useState(user?.preferred_contexts || []);
-  const [environments, setEnvironments] = useState(user?.preferred_environments || []);
+  const [editName, setEditName] = useState('');
+  const [tastes, setTastes] = useState([]);
+  const [styles, setStyles] = useState([]);
+  const [contexts, setContexts] = useState([]);
+  const [environments, setEnvironments] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  // Sync state with user profile once loaded
+  useEffect(() => {
+    if (user) {
+      setEditName(user.name || '');
+      setTastes(user.taste_preferences || []);
+      setStyles(user.preferred_styles || []);
+      setContexts(user.preferred_contexts || []);
+      setEnvironments(user.preferred_environments || []);
+    }
+  }, [user]);
 
   // Dynamic tags from DB
   const [availableTags, setAvailableTags] = useState({
@@ -33,21 +47,36 @@ export default function ProfilePage() {
     navigate('/login');
   };
 
-  const handleSave = () => {
-    updateUser({
-      taste_preferences: tastes,
-      preferred_styles: styles,
-      preferred_contexts: contexts,
-      preferred_environments: environments,
-    });
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const result = await updateUser({
+        name: editName,
+        taste_preferences: tastes,
+        preferred_styles: styles,
+        preferred_contexts: contexts,
+        preferred_environments: environments,
+      });
+      if (result.success) {
+        setIsEditing(false);
+      } else {
+        setSaveError(result.error || 'Không thể lưu thay đổi');
+      }
+    } catch (err) {
+      setSaveError('Không thể lưu thay đổi');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    setEditName(user?.name || '');
     setTastes(user?.taste_preferences || []);
     setStyles(user?.preferred_styles || []);
     setContexts(user?.preferred_contexts || []);
     setEnvironments(user?.preferred_environments || []);
+    setSaveError('');
     setIsEditing(false);
   };
 
@@ -92,18 +121,35 @@ export default function ProfilePage() {
           <div className="profile-avatar">
             {user?.name?.charAt(0)?.toUpperCase() || '?'}
           </div>
-          <h2 className="profile-name">{user?.name || 'Guest'}</h2>
-          <p className="profile-email">{user?.email || ''}</p>
+          {isEditing ? (
+            <div className="profile-name-edit" style={{ margin: 'var(--space-md) auto', width: '100%', maxWidth: '300px' }}>
+              <input
+                type="text"
+                className="input"
+                style={{ textAlign: 'center', fontSize: 'var(--font-lg)', fontWeight: 'bold' }}
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Nhập họ tên của bạn"
+                required
+              />
+            </div>
+          ) : (
+            <h2 className="profile-name">{user?.name || 'Guest'}</h2>
+          )}
+          <p className="profile-email" style={{ marginTop: isEditing ? '0' : 'var(--space-xs)' }}>{user?.email || ''}</p>
 
           <div className="profile-header-actions">
+            {saveError && <div className="profile-save-error" style={{ color: 'var(--accent)', marginBottom: 'var(--space-sm)', fontWeight: 600 }}>⚠️ {saveError}</div>}
             {!isEditing ? (
               <button className="btn btn-outline" onClick={() => setIsEditing(true)}>
                 ✏️ Chỉnh sửa sở thích
               </button>
             ) : (
               <div className="edit-actions">
-                <button className="btn btn-secondary" onClick={handleCancel}>Hủy</button>
-                <button className="btn btn-primary" onClick={handleSave}>💾 Lưu thay đổi</button>
+                <button className="btn btn-secondary" onClick={handleCancel} disabled={saving}>Hủy</button>
+                <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                  {saving ? '⏳ Đang lưu...' : '💾 Lưu thay đổi'}
+                </button>
               </div>
             )}
           </div>
