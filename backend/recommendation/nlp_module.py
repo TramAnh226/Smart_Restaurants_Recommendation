@@ -2,9 +2,8 @@ from typing import Dict, List
 import re
 import json
 import os
-import google.generativeai as genai
-from backend.config import Config
-
+#import google.generativeai as genai
+from config import settings
 
 # ===== LOAD FILE =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -72,87 +71,92 @@ VALID_MAPPING = {
 
 
 
-genai.configure(api_key=Config.GEMINI_API_KEY)
+# genai.configure(
+#     api_key=settings.GEMINI_API_KEY
+# )
 
-def extract_features_with_gemini(text: str) -> dict:
-    """
-    Sử dụng Gemini 2.5 Flash để phân tích văn bản và trích xuất tag dưới dạng JSON.
-    """
-    if not text or not isinstance(text, str):
-        return {}
+# def extract_features_with_gemini(text: str) -> dict:
+#     """
+#     Sử dụng Gemini 2.5 Flash để phân tích văn bản và trích xuất tag dưới dạng JSON.
+#     """
+#     if not text or not isinstance(text, str):
+#         return {}
 
-    # Model với cấu hình ép kiểu trả về JSON
-    # Khai báo response_mime_type giúp Gemini biết nó BẮT BUỘC phải sinh ra JSON hợp lệ
-    model = genai.GenerativeModel(
-        model_name=Config.AI_MODEL,
-        generation_config={"response_mime_type": "application/json"}
-    )
+#     # Model với cấu hình ép kiểu trả về JSON
+#     # Khai báo response_mime_type giúp Gemini biết nó BẮT BUỘC phải sinh ra JSON hợp lệ
+#     model = genai.GenerativeModel(
+#         model_name=settings.AI_MODEL,
+#         generation_config={
+#             "response_mime_type":
+#             "application/json"
+#         }
+#     )
 
-    # Prompt
-    prompt = f"""
-    Bạn là một chuyên gia phân tích dữ liệu đánh giá ẩm thực (Food Review NLP).
-    Nhiệm vụ của bạn là đọc đoạn văn bản đầu vào và trích xuất các đặc điểm món ăn/nhà hàng.
+#     # Prompt
+#     prompt = f"""
+#     Bạn là một chuyên gia phân tích dữ liệu đánh giá ẩm thực (Food Review NLP).
+#     Nhiệm vụ của bạn là đọc đoạn văn bản đầu vào và trích xuất các đặc điểm món ăn/nhà hàng.
     
-    YÊU CẦU BẮT BUỘC:
-    1. Chỉ được phép xuất ra định dạng JSON.
-    2. Tuyệt đối CHỈ SỬ DỤNG các tag nằm trong danh sách cho phép dưới đây. Nếu văn bản không có thông tin về một nhóm, hãy để mảng rỗng []. Không được tự bịa ra tag mới.
+#     YÊU CẦU BẮT BUỘC:
+#     1. Chỉ được phép xuất ra định dạng JSON.
+#     2. Tuyệt đối CHỈ SỬ DỤNG các tag nằm trong danh sách cho phép dưới đây. Nếu văn bản không có thông tin về một nhóm, hãy để mảng rỗng []. Không được tự bịa ra tag mới.
     
-    DANH SÁCH TAG CHO PHÉP:
-    - taste_tags: {VALID_TASTE}
-    - context_tags: {VALID_CONTEXT}
-    - style_tags: {VALID_STYLE}
-    - environment_tags: {VALID_ENVIRONMENT}
-    - cuisine_type: {VALID_CUISINE}
-    - category: {VALID_CATEGORY}
+#     DANH SÁCH TAG CHO PHÉP:
+#     - taste_tags: {VALID_TASTE}
+#     - context_tags: {VALID_CONTEXT}
+#     - style_tags: {VALID_STYLE}
+#     - environment_tags: {VALID_ENVIRONMENT}
+#     - cuisine_type: {VALID_CUISINE}
+#     - category: {VALID_CATEGORY}
     
-    ĐỊNH DẠNG JSON ĐẦU RA YÊU CẦU:
-    {{
-        "taste_tags": [],
-        "context_tags": [],
-        "style_tags": [],
-        "environment_tags": [],
-        "cuisine_type": [],
-        "category": []
-    }}
+#     ĐỊNH DẠNG JSON ĐẦU RA YÊU CẦU:
+#     {{
+#         "taste_tags": [],
+#         "context_tags": [],
+#         "style_tags": [],
+#         "environment_tags": [],
+#         "cuisine_type": [],
+#         "category": []
+#     }}
 
-    VĂN BẢN ĐẦU VÀO CẦN PHÂN TÍCH:
-    "{text}"
-    """
+#     VĂN BẢN ĐẦU VÀO CẦN PHÂN TÍCH:
+#     "{text}"
+#     """
 
-    try:
-        # gọi model 
-        response = model.generate_content(prompt)
-        # trả về
-        raw_dict = json.loads(response.text)
+#     try:
+#         # gọi model 
+#         response = model.generate_content(prompt)
+#         # trả về
+#         raw_dict = json.loads(response.text)
         
-        validated_dict = {}
+#         validated_dict = {}
         
-        for key, valid_list in VALID_MAPPING.items():
-            # Lấy list tag mà AI trả về. Nếu AI làm rơi mất key này, mặc định là list rỗng []
-            raw_tags = raw_dict.get(key, [])
+#         for key, valid_list in VALID_MAPPING.items():
+#             # Lấy list tag mà AI trả về. Nếu AI làm rơi mất key này, mặc định là list rỗng []
+#             raw_tags = raw_dict.get(key, [])
             
-            # Đề phòng AI lỡ trả về string (vd: "spicy") thay vì list (vd: ["spicy"])
-            if not isinstance(raw_tags, list):
-                raw_tags = [raw_tags] if isinstance(raw_tags, str) else []
+#             # Đề phòng AI lỡ trả về string (vd: "spicy") thay vì list (vd: ["spicy"])
+#             if not isinstance(raw_tags, list):
+#                 raw_tags = [raw_tags] if isinstance(raw_tags, str) else []
                 
-            valid_set = set(valid_list)
-            validated_tags = [tag for tag in raw_tags if tag in valid_set]
+#             valid_set = set(valid_list)
+#             validated_tags = [tag for tag in raw_tags if tag in valid_set]
             
-            # Lưu vào kết quả cuối cùng (đảm bảo không bị trùng lặp bằng list(set()))
-            validated_dict[key] = list(set(validated_tags))
+#             # Lưu vào kết quả cuối cùng (đảm bảo không bị trùng lặp bằng list(set()))
+#             validated_dict[key] = list(set(validated_tags))
             
-        return validated_dict
+#         return validated_dict
         
-    except Exception as e:
-        print(f"Lỗi khi gọi Gemini API: {e}")
-        return {
-            "taste_tags": [], 
-            "context_tags": [], 
-            "style_tags": [],
-            "environment_tags": [], 
-            "cuisine_type": [], 
-            "category": []
-        }
+#     except Exception as e:
+#         print(f"Lỗi khi gọi Gemini API: {e}")
+#         return {
+#             "taste_tags": [], 
+#             "context_tags": [], 
+#             "style_tags": [],
+#             "environment_tags": [], 
+#             "cuisine_type": [], 
+#             "category": []
+#         }
 
 
 def extract_features_rule_based(text: str) -> dict:
@@ -230,20 +234,20 @@ def extract_features(text: str) -> Dict:
 
     total_tags_found = sum(len(tags) for tags in features.values())
     # Nếu số tag Rule-based tìm được < 3 thì mới gọi gemini ai
-    if(total_tags_found < 3):
-        features_llm = extract_features_with_gemini(text)
+    # if(total_tags_found < 3):
+    #     features_llm = extract_features_with_gemini(text)
 
-        # Thêm những tag AI có, mà Rule-based không có
-        for key in features.keys():
-            # Chuyển list thành set để dễ gộp
-            regex_tags = set(features.get(key, []))
-            ai_tags = set(features_llm.get(key, []))
+    #     # Thêm những tag AI có, mà Rule-based không có
+    #     for key in features.keys():
+    #         # Chuyển list thành set để dễ gộp
+    #         regex_tags = set(features.get(key, []))
+    #         ai_tags = set(features_llm.get(key, []))
             
-            # Phép hợp | (Union)
-            merged_tags = regex_tags | ai_tags
+    #         # Phép hợp | (Union)
+    #         merged_tags = regex_tags | ai_tags
             
-            # Cập nhật lại vào features dưới dạng list
-            features[key] = list(merged_tags)
+    #         # Cập nhật lại vào features dưới dạng list
+    #         features[key] = list(merged_tags)
 
     return features
 

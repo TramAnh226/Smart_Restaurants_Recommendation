@@ -1,5 +1,5 @@
 import math
-from learning_module import LearningModule
+from recommendation.learning_module import LearningModule
 
 
 class RecommendationScorer:
@@ -74,7 +74,10 @@ class RecommendationScorer:
     # ----------------------------
     def price_score(self, budget, avg_price):
         if budget is None or budget <= 0:
-            return None
+            return 0
+        
+        if avg_price is None:
+            return 0
 
         diff_ratio = abs(budget - avg_price) / budget
         score = 1 - diff_ratio
@@ -166,22 +169,23 @@ class RecommendationScorer:
         if scores.get("taste", 0) >= 8:
             reasons.append("matches your taste")
 
-        if scores.get("price", 0) >= 8:
+        price_score = scores.get("price") or 0
+        if price_score >= 8:
             reasons.append("fits your budget")
 
-        if scores.get("distance", 0) >= 8:
+        if (scores.get("distance") or 0) >= 8:
             reasons.append("is nearby")
 
-        if scores.get("context", 0) >= 8:
+        if (scores.get("context") or 0) >= 8:
             reasons.append("fits your current context")
 
         if scores.get("rating", 0) >= 8:
             reasons.append("has strong ratings")
 
-        if scores.get("weather", 0) >= 8:
+        if (scores.get("weather") or 0) >= 8:
             reasons.append("matches current weather")
 
-        if scores.get("learning", 0) >= 8:
+        if (scores.get("learning") or 0) >= 8:
             reasons.append("aligns with your past behavior")
 
         if not reasons:

@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from services.recommendation_service import RecommendationService
-from backend.auth.dependencies import verify_user
+from auth.dependencies import verify_user
 from fastapi import Depends
 
 router = APIRouter(
@@ -13,13 +13,13 @@ recommendation_service=RecommendationService()
 
 @router.post("/")
 async def recommend(
-    data:dict,
-    user=Depends(verify_user)
+    data: dict,
+    #user=Depends(verify_user)
 ):
 
-    result=await recommendation_service.recommend(
-        user_id=user["id"],
-        request_data=data
+    return await recommendation_service.get_recommendation(
+        text=data.get("query", ""),
+        budget=data.get("budget"),
+        latitude=data.get("latitude"),
+        longitude=data.get("longitude")
     )
-
-    return result

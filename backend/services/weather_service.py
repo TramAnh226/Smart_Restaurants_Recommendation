@@ -16,7 +16,7 @@ class WeatherService:
         params = {
             "lat": lat,
             "lon": lon,
-            "appid": settings.WEATHER_API_KEY,
+            "appid": settings.OPENWEATHER_API_KEY,
             "units": "metric"
         }
 

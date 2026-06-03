@@ -29,7 +29,8 @@ class FavoriteService:
             .table("favorites")
             .insert({
                 "user_id": user_id,
-                "restaurant_id": restaurant_id
+                "restaurant_id": restaurant_id,
+                "favorite_type": "restaurant"
             })
             .execute()
         )
