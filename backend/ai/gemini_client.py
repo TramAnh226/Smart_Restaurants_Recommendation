@@ -1,4 +1,5 @@
 import json
+import asyncio
 import google.generativeai as genai
 
 from config import settings
@@ -14,39 +15,34 @@ model = genai.GenerativeModel(
 
 class AIService:
 
-    async def extract_intent(
+    async def generate_response(
         self,
-        query: str
+        query,
+        features,
+        restaurants
     ):
 
         prompt = f"""
-        Extract restaurant recommendation tags.
+        Bạn là chatbot tư vấn nhà hàng.
 
-        Return JSON only.
+        Người dùng hỏi:
 
-        {{
-            "taste_tags": [],
-            "context_tags": [],
-            "style_tags": []
-        }}
-
-        User:
         {query}
+
+        NLP đã phân tích:
+
+        {json.dumps(features, ensure_ascii=False)}
+
+        Top nhà hàng:
+
+        {json.dumps(restaurants[:3], ensure_ascii=False)}
+
+        Viết phản hồi ngắn gọn 2 câu.
         """
 
-        response = model.generate_content(
+        response = await asyncio.to_thread(
+            model.generate_content,
             prompt
         )
 
-        try:
-            return json.loads(
-                response.text
-            )
-
-        except Exception:
-
-            return {
-                "taste_tags": [],
-                "context_tags": [],
-                "style_tags": []
-            }
+        return response.text

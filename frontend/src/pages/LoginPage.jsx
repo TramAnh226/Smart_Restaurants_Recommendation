@@ -19,6 +19,24 @@ export default function LoginPage() {
     return null;
   }
 
+  const translateError = (errorMsg) => {
+    if (!errorMsg) return 'Đã có lỗi xảy ra';
+    const lower = errorMsg.toLowerCase();
+    if (lower.includes('invalid login credentials')) {
+      return 'Email hoặc mật khẩu không chính xác.';
+    }
+    if (lower.includes('email already in use') || lower.includes('already registered') || lower.includes('user already exists')) {
+      return 'Email này đã được đăng ký sử dụng.';
+    }
+    if (lower.includes('password should be at least')) {
+      return 'Mật khẩu phải có ít nhất 6 ký tự.';
+    }
+    if (lower.includes('invalid email') || lower.includes('email address is invalid')) {
+      return 'Địa chỉ email không hợp lệ.';
+    }
+    return errorMsg;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -35,7 +53,7 @@ export default function LoginPage() {
       if (result.success) {
         navigate('/', { replace: true });
       } else {
-        setError(result.error || 'Đã có lỗi xảy ra');
+        setError(translateError(result.error));
       }
     } catch (err) {
       setError('Đã có lỗi xảy ra');

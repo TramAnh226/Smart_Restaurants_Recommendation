@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { getAvailableTags } from '../services/supabase';
-import { tagLabel, TASTE_EMOJI, TASTE_VI, CONTEXT_EMOJI, CONTEXT_VI, ENV_EMOJI, ENV_VI, STYLE_EMOJI, STYLE_VI } from '../utils/tagLabels';
+import { tagLabel, TASTE_EMOJI, TASTE_VI, ALLERGY_EMOJI, ALLERGY_VI, COUNTRY_EMOJI, COUNTRY_VI, STYLE_EMOJI, STYLE_VI } from '../utils/tagLabels';
 import './ProfilePage.css';
 
 export default function ProfilePage() {
@@ -10,14 +10,28 @@ export default function ProfilePage() {
   const navigate = useNavigate();
 
   const [isEditing, setIsEditing] = useState(false);
-  const [tastes, setTastes] = useState(user?.taste_preferences || []);
-  const [styles, setStyles] = useState(user?.preferred_styles || []);
-  const [contexts, setContexts] = useState(user?.preferred_contexts || []);
-  const [environments, setEnvironments] = useState(user?.preferred_environments || []);
+  const [editName, setEditName] = useState('');
+  const [tastes, setTastes] = useState([]);
+  const [styles, setStyles] = useState([]);
+  const [allergyPrefs, setAllergyPrefs] = useState([]);
+  const [preferredCountries, setPreferredCountries] = useState([]);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  // Sync state with user profile once loaded
+  useEffect(() => {
+    if (user) {
+      setEditName(user.name || '');
+      setTastes(user.taste_preferences || []);
+      setStyles(user.preferred_styles || []);
+      setAllergyPrefs(user.allergy_preferences || []);
+      setPreferredCountries(user.preferred_countries || []);
+    }
+  }, [user]);
 
   // Dynamic tags from DB
   const [availableTags, setAvailableTags] = useState({
-    tasteTags: [], styleTags: [], contextTags: [], environmentTags: []
+    tasteTags: [], styleTags: []
   });
   const [tagsLoading, setTagsLoading] = useState(true);
 
@@ -33,21 +47,36 @@ export default function ProfilePage() {
     navigate('/login');
   };
 
-  const handleSave = () => {
-    updateUser({
-      taste_preferences: tastes,
-      preferred_styles: styles,
-      preferred_contexts: contexts,
-      preferred_environments: environments,
-    });
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    setSaveError('');
+    try {
+      const result = await updateUser({
+        name: editName,
+        taste_preferences: tastes,
+        preferred_styles: styles,
+        allergy_preferences: allergyPrefs,
+        preferred_countries: preferredCountries,
+      });
+      if (result.success) {
+        setIsEditing(false);
+      } else {
+        setSaveError(result.error || 'Không thể lưu thay đổi');
+      }
+    } catch (err) {
+      setSaveError('Không thể lưu thay đổi');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
+    setEditName(user?.name || '');
     setTastes(user?.taste_preferences || []);
     setStyles(user?.preferred_styles || []);
-    setContexts(user?.preferred_contexts || []);
-    setEnvironments(user?.preferred_environments || []);
+    setAllergyPrefs(user?.allergy_preferences || []);
+    setPreferredCountries(user?.preferred_countries || []);
+    setSaveError('');
     setIsEditing(false);
   };
 
@@ -92,25 +121,42 @@ export default function ProfilePage() {
           <div className="profile-avatar">
             {user?.name?.charAt(0)?.toUpperCase() || '?'}
           </div>
-          <h2 className="profile-name">{user?.name || 'Guest'}</h2>
-          <p className="profile-email">{user?.email || ''}</p>
+          {isEditing ? (
+            <div className="profile-name-edit" style={{ margin: 'var(--space-md) auto', width: '100%', maxWidth: '300px' }}>
+              <input
+                type="text"
+                className="input"
+                style={{ textAlign: 'center', fontSize: 'var(--font-lg)', fontWeight: 'bold' }}
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+                placeholder="Nhập họ tên của bạn"
+                required
+              />
+            </div>
+          ) : (
+            <h2 className="profile-name">{user?.name || 'Guest'}</h2>
+          )}
+          <p className="profile-email" style={{ marginTop: isEditing ? '0' : 'var(--space-xs)' }}>{user?.email || ''}</p>
 
           <div className="profile-header-actions">
+            {saveError && <div className="profile-save-error" style={{ color: 'var(--accent)', marginBottom: 'var(--space-sm)', fontWeight: 600 }}>⚠️ {saveError}</div>}
             {!isEditing ? (
               <button className="btn btn-outline" onClick={() => setIsEditing(true)}>
                 ✏️ Chỉnh sửa sở thích
               </button>
             ) : (
               <div className="edit-actions">
-                <button className="btn btn-secondary" onClick={handleCancel}>Hủy</button>
-                <button className="btn btn-primary" onClick={handleSave}>💾 Lưu thay đổi</button>
+                <button className="btn btn-secondary" onClick={handleCancel} disabled={saving}>Hủy</button>
+                <button className="btn btn-primary" onClick={handleSave} disabled={saving}>
+                  {saving ? '⏳ Đang lưu...' : '💾 Lưu thay đổi'}
+                </button>
               </div>
             )}
           </div>
 
           {renderTagSection('🍴 Sở thích khẩu vị', availableTags.tasteTags, tastes, TASTE_EMOJI, TASTE_VI, toggleTag(setTastes))}
-          {renderTagSection('🎯 Dịp / Hoàn cảnh', availableTags.contextTags, contexts, CONTEXT_EMOJI, CONTEXT_VI, toggleTag(setContexts))}
-          {renderTagSection('🏠 Không gian yêu thích', availableTags.environmentTags, environments, ENV_EMOJI, ENV_VI, toggleTag(setEnvironments))}
+          {renderTagSection('🚫 Hạn chế dị ứng', Object.keys(ALLERGY_VI), allergyPrefs, ALLERGY_EMOJI, ALLERGY_VI, toggleTag(setAllergyPrefs))}
+          {renderTagSection('🌐 Ẩm thực các quốc gia', Object.keys(COUNTRY_VI), preferredCountries, COUNTRY_EMOJI, COUNTRY_VI, toggleTag(setPreferredCountries))}
           {renderTagSection('🎨 Phong cách quán', availableTags.styleTags, styles, STYLE_EMOJI, STYLE_VI, toggleTag(setStyles))}
 
           {!isEditing && (

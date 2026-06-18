@@ -5,12 +5,13 @@ from recommendation.learning_module import LearningModule
 class RecommendationScorer:
     def __init__(self):
         self.base_weights = {
-            "taste": 0.25,
-            "price": 0.15,
-            "distance": 0.20,
-            "context": 0.15,
-            "rating": 0.10,
-            "weather": 0.10,
+            "food": 0.30,
+            "taste": 0.20,
+            "price": 0.10,
+            "distance": 0.15,
+            "context": 0.10,
+            "rating": 0.05,
+            "weather": 0.05,
             "learning": 0.05
         }
 
@@ -42,7 +43,7 @@ class RecommendationScorer:
     # ----------------------------
     def similarity_score(self, user_tags, restaurant_tags):
         if not user_tags:
-            return 5.0
+            return None
 
         user_set = set(user_tags)
         restaurant_set = set(restaurant_tags or [])
@@ -74,10 +75,10 @@ class RecommendationScorer:
     # ----------------------------
     def price_score(self, budget, avg_price):
         if budget is None or budget <= 0:
-            return 0
+            return None
         
         if avg_price is None:
-            return 0
+            return None
 
         diff_ratio = abs(budget - avg_price) / budget
         score = 1 - diff_ratio
@@ -145,6 +146,22 @@ class RecommendationScorer:
         }
 
         return mapping.get(relevance, 5)
+    
+    def food_score(self, query_food_tags, restaurant_food_tags):
+
+        if not query_food_tags:
+            return None
+
+        match = len(
+            set(query_food_tags)
+            &
+            set(restaurant_food_tags)
+        )
+
+        return round(
+            match / len(query_food_tags) * 10,
+            2
+        )
 
     # ----------------------------
     # Final Score
@@ -166,7 +183,10 @@ class RecommendationScorer:
     def explain_recommendation(self, scores):
         reasons = []
 
-        if scores.get("taste", 0) >= 8:
+        if (scores.get("food") or 0) >= 8:
+            reasons.append("matches the food you are looking for")
+
+        if (scores.get("taste") or 0) >= 8:
             reasons.append("matches your taste")
 
         price_score = scores.get("price") or 0
@@ -203,7 +223,11 @@ if __name__ == "__main__":
     learner.update_behavior(["cafe"], "click")
     learner.update_behavior(["spicy"], "view")
 
+    
+
     scores = {
+
+
         "taste": scorer.taste_score(
             ["spicy"],
             ["spicy", "savory"]

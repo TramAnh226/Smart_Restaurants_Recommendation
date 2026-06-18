@@ -1,5 +1,14 @@
 from auth.supabase_client import supabase
+from pydantic import BaseModel
 
+class RecommendationHistoryCreate(BaseModel):
+    user_id: str
+    restaurant_id: str | None = None
+    menu_id: str | None = None
+    context: dict | None = None
+    score: float | None = None
+    reason: str | None = None
+    action: str | None = None
 
 class HistoryService:
 

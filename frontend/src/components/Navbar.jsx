@@ -11,16 +11,16 @@ export default function Navbar() {
 
   if (location.pathname === '/login') return null;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
   const navLinks = [
-    { path: '/', label: 'Trang chủ', icon: '🏠' },
-    { path: '/chat', label: 'Chat AI', icon: '💬' },
-    { path: '/favorites', label: 'Yêu thích', icon: '❤️' },
-    { path: '/profile', label: 'Hồ sơ', icon: '👤' },
+    { path: '/', label: 'Trang chủ' },
+    { path: '/chat', label: 'Chat AI' },
+    { path: '/favorites', label: 'Yêu thích' },
+    { path: '/profile', label: 'Hồ sơ' },
   ];
 
   return (

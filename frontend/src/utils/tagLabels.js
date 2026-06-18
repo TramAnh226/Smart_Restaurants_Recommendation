@@ -41,6 +41,26 @@ export const STYLE_VI = {
   cafe: 'Cafe', fast_food: 'Thức ăn nhanh', restaurant: 'Nhà hàng', snack: 'Ăn vặt', street_food: 'Đường phố'
 };
 
+export const ALLERGY_EMOJI = {
+  peanuts: '🥜', seafood: '🦀', dairy: '🥛', gluten: '🌾', egg: '🥚',
+  soy: '🫘', beef: '🥩', chicken: '🍗', nuts: '🌰', sesame: '🌱'
+};
+
+export const ALLERGY_VI = {
+  peanuts: 'Đậu phộng', seafood: 'Hải sản', dairy: 'Sữa & Bơ sữa', gluten: 'Gluten', egg: 'Trứng',
+  soy: 'Đậu nành', beef: 'Thịt bò', chicken: 'Thịt gà', nuts: 'Hạt cây', sesame: 'Vừng/Mè'
+};
+
+export const COUNTRY_EMOJI = {
+  vietnam: '🇻🇳', japan: '🇯🇵', korea: '🇰🇷', china: '🇨🇳', thailand: '🇹🇭',
+  italy: '🇮🇹', usa: '🇺🇸', france: '🇫🇷', india: '🇮🇳', mexico: '🇲🇽'
+};
+
+export const COUNTRY_VI = {
+  vietnam: 'Việt Nam', japan: 'Nhật Bản', korea: 'Hàn Quốc', china: 'Trung Quốc', thailand: 'Thái Lan',
+  italy: 'Ý', usa: 'Mỹ', france: 'Pháp', india: 'Ấn Độ', mexico: 'Mexico'
+};
+
 /**
  * Get display label for a tag: "emoji Vietnamese"
  * Falls back to Title Case English if no Vietnamese mapping exists.
@@ -56,3 +76,6 @@ export const tasteLabel = (tag) => tagLabel(tag, TASTE_EMOJI, TASTE_VI);
 export const contextLabel = (tag) => tagLabel(tag, CONTEXT_EMOJI, CONTEXT_VI);
 export const envLabel = (tag) => tagLabel(tag, ENV_EMOJI, ENV_VI);
 export const styleLabel = (tag) => tagLabel(tag, STYLE_EMOJI, STYLE_VI);
+export const allergyLabel = (tag) => tagLabel(tag, ALLERGY_EMOJI, ALLERGY_VI);
+export const countryLabel = (tag) => tagLabel(tag, COUNTRY_EMOJI, COUNTRY_VI);
+

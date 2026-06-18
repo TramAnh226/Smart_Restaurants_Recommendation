@@ -18,3 +18,16 @@
   font-size: var(--font-sm);
   color: var(--text-tertiary);
 }
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+@media (max-width: 480px) {
+  .favorites-grid {
+    grid-template-columns: 1fr;
+  }
+}

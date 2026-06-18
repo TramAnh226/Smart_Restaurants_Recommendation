@@ -1,7 +1,7 @@
 import RestaurantCard from './RestaurantCard';
 import './RecommendationCarousel.css';
 
-export default function RecommendationCarousel({ title, restaurants }) {
+export default function RecommendationCarousel({ title, restaurants, isFavorite, onToggleFavorite }) {
   if (!restaurants || restaurants.length === 0) return null;
 
   return (
@@ -12,9 +12,12 @@ export default function RecommendationCarousel({ title, restaurants }) {
           <RestaurantCard
             key={restaurant.id || index}
             restaurant={restaurant}
+            isFavorite={isFavorite ? isFavorite(restaurant.id) : false}
+            onToggleFavorite={onToggleFavorite ? () => onToggleFavorite(restaurant.id) : undefined}
           />
         ))}
       </div>
     </div>
   );
 }
+

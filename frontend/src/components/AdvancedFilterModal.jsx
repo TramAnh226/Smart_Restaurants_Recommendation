@@ -77,13 +77,13 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
           <h2>⚙️ Lọc Nâng Cao</h2>
           <button className="close-btn" onClick={onClose}>✕</button>
         </div>
-        
+
         <div className="adv-filter-body">
           <div className="filter-group">
             <label>🔍 Tìm tên quán ăn</label>
-            <input 
-              type="text" 
-              placeholder="Nhập tên quán..." 
+            <input
+              type="text"
+              placeholder="Nhập tên quán..."
               value={filters.search}
               onChange={(e) => handleChange('search', e.target.value)}
               className="filter-input"
@@ -92,10 +92,10 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
 
           <div className="filter-group">
             <label>📍 Khoảng cách tối đa: {filters.maxDistance < 20 ? `${filters.maxDistance} km` : 'Tất cả'}</label>
-            <input 
-              type="range" 
-              min="1" 
-              max="20" 
+            <input
+              type="range"
+              min="1"
+              max="20"
               value={filters.maxDistance}
               onChange={(e) => handleChange('maxDistance', Number(e.target.value))}
               className="filter-slider"
@@ -107,10 +107,10 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
 
           <div className="filter-group">
             <label>⭐️ Đánh giá tối thiểu: {filters.minRating > 0 ? `${filters.minRating} ⭐️` : 'Tất cả'}</label>
-            <input 
-              type="range" 
-              min="0" 
-              max="5" 
+            <input
+              type="range"
+              min="0"
+              max="5"
               step="0.5"
               value={filters.minRating}
               onChange={(e) => handleChange('minRating', Number(e.target.value))}
@@ -123,8 +123,8 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
 
           <div className="filter-group">
             <label>💰 Mức giá tối đa</label>
-            <select 
-              value={filters.maxPrice || ''} 
+            <select
+              value={filters.maxPrice || ''}
               onChange={(e) => handleChange('maxPrice', e.target.value ? Number(e.target.value) : '')}
               className="filter-select"
             >
@@ -146,8 +146,8 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
                   <label>🍴 Khẩu vị (từ menu)</label>
                   <div className="filter-tags">
                     {availableTags.tasteTags.map(tag => (
-                      <span 
-                        key={tag} 
+                      <span
+                        key={tag}
                         className={`filter-tag ${(filters.tastes || []).includes(tag) ? 'active' : ''}`}
                         onClick={() => toggleTag('tastes', tag)}
                       >
@@ -164,8 +164,8 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
                   <label>🎯 Dịp / Hoàn cảnh</label>
                   <div className="filter-tags">
                     {availableTags.contextTags.map(tag => (
-                      <span 
-                        key={tag} 
+                      <span
+                        key={tag}
                         className={`filter-tag ${(filters.contexts || []).includes(tag) ? 'active' : ''}`}
                         onClick={() => toggleTag('contexts', tag)}
                       >
@@ -182,8 +182,8 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
                   <label>🏠 Không gian</label>
                   <div className="filter-tags">
                     {availableTags.environmentTags.map(tag => (
-                      <span 
-                        key={tag} 
+                      <span
+                        key={tag}
                         className={`filter-tag ${(filters.environments || []).includes(tag) ? 'active' : ''}`}
                         onClick={() => toggleTag('environments', tag)}
                       >
@@ -200,8 +200,8 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
                   <label>🎨 Phong cách quán</label>
                   <div className="filter-tags">
                     {availableTags.styleTags.map(tag => (
-                      <span 
-                        key={tag} 
+                      <span
+                        key={tag}
                         className={`filter-tag ${(filters.styles || []).includes(tag) ? 'active' : ''}`}
                         onClick={() => toggleTag('styles', tag)}
                       >
