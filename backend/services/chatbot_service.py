@@ -50,13 +50,14 @@ class ChatbotService:
 
         try:
 
-            ai_reply = await self.ai.generate_reply(
-                query,
-                recommendations
+            ai_reply = await self.ai.generate_response(
+                query=query,
+                features=recommendations.get("features", {}),
+                restaurants=recommendations.get("restaurants", {}).get("restaurants", [])
             )
 
-        except Exception:
-
+        except Exception as e:
+            print(f"Error calling generate_response, falling back to rule-based: {e}")
             ai_reply = self.build_fallback_reply(
                 query,
                 recommendations

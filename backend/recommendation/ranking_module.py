@@ -147,28 +147,15 @@ def top_k(scored_list: List[Dict], k: int = None) -> List[Dict]:
         if reason_list is None:
             reason_list = generate_reasons(res, score_val)
 
-        entry = {
+        # Copy all fields from the database result to preserve schema values
+        entry = dict(res)
+        entry.update({
             "name": res.get("name", "N/A"),
             "score": round(score_val, 2),
             "reason": reason_list,
             "rank": rank,
-        }
-
-        # Thêm các fields từ Supabase schema nếu có
-        if res.get("id"):
-            entry["id"] = res["id"]
-        if res.get("rating"):
-            entry["rating"] = res["rating"]
-        if res.get("price_lowest"):
-            entry["price_lowest"] = res["price_lowest"]
-        if res.get("price_highest"):
-            entry["price_highest"] = res["price_highest"]
-        if res.get("distance") is not None:
-            entry["distance"] = res["distance"]
-        if res.get("taste_tags"):
-            entry["taste_tags"] = res["taste_tags"]
-        if res.get("context_tags"):
-            entry["context_tags"] = res["context_tags"]
+        })
+        # Maintain compatibility for "image" field mapped from "preview"
         if res.get("preview"):
             entry["image"] = res["preview"]
 

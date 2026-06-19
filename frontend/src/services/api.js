@@ -1,4 +1,5 @@
-import { mockWeather } from '../data/mockData';
+import { mockWeather, getMockChatResponse } from '../data/mockData';
+import { getRandomRestaurants } from './supabase';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000';
 
@@ -37,7 +38,13 @@ export async function sendChatMessage({ query, user_id, user_preferences, contex
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query
+        query,
+        user_id,
+        user_preferences,
+        context,
+        budget: context?.budget,
+        latitude: context?.location?.lat,
+        longitude: context?.location?.lng,
       }),
       signal: controller.signal
     });
@@ -46,8 +53,8 @@ export async function sendChatMessage({ query, user_id, user_preferences, contex
     if (!response.ok) throw new Error('Recommendation API returned error status');
     const data = await response.json();
     return {
-      response_message: data.response_message || 'Đây là gợi ý của mình:',
-      recommendations: data.recommendations || []
+      response_message: `Mình tìm được ${data.restaurants?.top_k || 0} quán phù hợp.`,
+      recommendations: data.restaurants?.restaurants || []
     };
   } catch (error) {
     console.warn('Recommendation API failed, falling back to mock AI + Supabase:', error.message);
@@ -73,11 +80,8 @@ export async function sendChatMessage({ query, user_id, user_preferences, contex
     }
 
     return {
-      response_message:
-        `Mình tìm được ${data.restaurants.top_k} quán phù hợp.`,
-
-      recommendations:
-        data.restaurants.restaurants
+      response_message: fallbackText || 'Đây là gợi ý của mình:',
+      recommendations: recommendations
     };
   }
 }
