@@ -148,20 +148,34 @@ class RecommendationScorer:
         return mapping.get(relevance, 5)
     
     def food_score(self, query_food_tags, restaurant_food_tags):
-
         if not query_food_tags:
             return None
 
-        match = len(
-            set(query_food_tags)
-            &
-            set(restaurant_food_tags)
-        )
+        # Định nghĩa điểm cho từng loại tag
+        exact_tags = {"pho_ga", "pho_bo", "bun_bo_hue", "com_tam", "lau_thai", "lau_bo", "ga_ran", "ga_nuong"}
+        main_dish_tags = {"pho", "bun", "lau", "com_tam", "pizza", "sushi", "milk_tea", "che", "burger"}
+        modifier_tags = {"bo", "ga"}
 
-        return round(
-            match / len(query_food_tags) * 10,
-            2
-        )
+        # Kiểm tra khớp chính xác trước (Exact Match)
+        common_exact = set(query_food_tags) & set(restaurant_food_tags) & exact_tags
+        if common_exact:
+            return 20.0
+
+        # Khớp một phần (Partial Match)
+        score = 0.0
+        matched = set(query_food_tags) & set(restaurant_food_tags)
+        for tag in matched:
+            if tag in exact_tags:
+                score += 20.0
+            elif tag in main_dish_tags:
+                score += 5.0
+            elif tag in modifier_tags:
+                score += 2.0
+            else:
+                score += 5.0  # Mặc định cho các tag khác nếu có
+
+        # Giới hạn điểm số tối đa là 20.0
+        return min(score, 20.0)
 
     # ----------------------------
     # Final Score

@@ -276,6 +276,10 @@ def preprocess(text: str) -> str:
     return text.strip()
 
 
+# ===== EXTRACTION CACHE =====
+_extraction_cache = {}
+
+
 # ===== MAIN FUNCTIONS =====
 
 def extract_features(text: str) -> Dict:
@@ -288,6 +292,10 @@ def extract_features(text: str) -> Dict:
         return res
     
     text = preprocess(text)
+    if text in _extraction_cache:
+        # Trả về bản sao để tránh chỉnh sửa ngoài ý muốn làm thay đổi cache
+        return {k: list(v) for k, v in _extraction_cache[text].items()}
+
     features = extract_features_rule_based(text)
 
     # Nếu rule-based tìm được ít hơn 3 tag và cấu hình API Key đầy đủ thì gọi Gemini bổ trợ
@@ -305,6 +313,9 @@ def extract_features(text: str) -> Dict:
     # Chiết xuất food_tags động từ văn bản gốc
     features["food_tags"] = extract_food_tags(text)
 
+    # Lưu bản sao vào cache
+    _extraction_cache[text] = {k: list(v) for k, v in features.items()}
+
     return features
 
 
@@ -318,6 +329,9 @@ async def extract_features_async(text: str) -> Dict:
         return res
     
     text = preprocess(text)
+    if text in _extraction_cache:
+        return {k: list(v) for k, v in _extraction_cache[text].items()}
+
     features = extract_features_rule_based(text)
 
     total_tags_found = sum(len(tags) for tags in features.values())
@@ -332,6 +346,9 @@ async def extract_features_async(text: str) -> Dict:
 
     # Chiết xuất food_tags động từ văn bản gốc
     features["food_tags"] = extract_food_tags(text)
+
+    # Lưu bản sao vào cache
+    _extraction_cache[text] = {k: list(v) for k, v in features.items()}
 
     return features
 

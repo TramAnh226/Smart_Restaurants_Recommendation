@@ -1,0 +1,73 @@
+{
+  "pho_ga": [
+    "phở gà",
+    "pho ga"
+  ],
+  "pho_bo": [
+    "phở bò",
+    "pho bo"
+  ],
+  "bun_bo_hue": [
+    "bún bò huế",
+    "bun bo hue"
+  ],
+  "com_tam": [
+    "cơm tấm",
+    "com tam"
+  ],
+  "lau_thai": [
+    "lẩu thái",
+    "lau thai"
+  ],
+  "lau_bo": [
+    "lẩu bò",
+    "lau bo"
+  ],
+  "ga_ran": [
+    "gà rán",
+    "ga ran"
+  ],
+  "ga_nuong": [
+    "gà nướng",
+    "ga nuong"
+  ],
+  "pho": [
+    "phở",
+    "pho"
+  ],
+  "bun": [
+    "bún",
+    "bun"
+  ],
+  "lau": [
+    "lẩu",
+    "lau"
+  ],
+  "bo": [
+    "bò",
+    "bo"
+  ],
+  "ga": [
+    "gà",
+    "ga",
+    "gà"
+  ],
+  "pizza": [
+    "pizza"
+  ],
+  "sushi": [
+    "sushi"
+  ],
+  "milk_tea": [
+    "trà sữa",
+    "milk tea"
+  ],
+  "che": [
+    "chè",
+    "che"
+  ],
+  "burger": [
+    "hamburger",
+    "burger"
+  ]
+}

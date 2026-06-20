@@ -92,10 +92,14 @@ def test_explain_recommendation():
     assert "is nearby" not in explanation
 
 def test_food_score():
-    # Full match
-    assert scorer.food_score(["pho", "bo"], ["pho", "bo"]) == 10.0
-    # Partial match
-    assert scorer.food_score(["pho", "bo"], ["pho"]) == 5.0
+    # Exact match
+    assert scorer.food_score(["pho_ga"], ["pho_ga"]) == 20.0
+    # Partial match - main dish only
+    assert scorer.food_score(["pho", "ga"], ["pho"]) == 5.0
+    # Partial match - modifier only
+    assert scorer.food_score(["pho", "ga"], ["ga"]) == 2.0
+    # Partial match - both main dish and modifier
+    assert scorer.food_score(["pho", "bo"], ["pho", "bo"]) == 7.0
     # No match
     assert scorer.food_score(["pho"], ["bun"]) == 0.0
     # Empty tags
@@ -103,7 +107,7 @@ def test_food_score():
 
 def test_explain_recommendation_food():
     scores = {
-        "food": 9.0,
+        "food": 20.0,
         "taste": 5.0
     }
     explanation = scorer.explain_recommendation(scores)

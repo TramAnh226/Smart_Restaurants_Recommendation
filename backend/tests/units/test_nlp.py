@@ -53,9 +53,12 @@ async def test_extract_features_async():
 def test_food_tag_extraction():
     from recommendation.food_tag_module import extract_food_tags
     
-    # Basic word boundary matching
-    assert "pho" in extract_food_tags("Phở bò Hà Nội")
-    assert "bo" in extract_food_tags("Phở bò Hà Nội")
+    # Basic word boundary matching for multi-word food tags
+    assert "pho_bo" in extract_food_tags("Phở bò Hà Nội")
+    
+    # Basic word boundary matching for single-word food tags (when not in multi-word)
+    assert "pho" in extract_food_tags("Tôi muốn ăn phở")
+    assert "bo" in extract_food_tags("Cơm xào thịt bò")
     
     # Avoid substring matching (e.g. "pho" in "Phong")
     assert "pho" not in extract_food_tags("Nhà hàng Phong Cảnh")
@@ -64,3 +67,17 @@ def test_food_tag_extraction():
     res = extract_features("Tôi muốn ăn cơm tấm và uống trà sữa")
     assert "com_tam" in res["food_tags"]
     assert "milk_tea" in res["food_tags"]
+
+def test_nlp_cache():
+    from recommendation.nlp_module import _extraction_cache
+    
+    _extraction_cache.clear()
+    text = "Quán phở gà ngon"
+    res1 = extract_features(text)
+    
+    # Preprocessed key should be in cache
+    assert "quán phở gà ngon" in _extraction_cache
+    res2 = extract_features(text)
+    
+    assert res1 == res2
+    assert res1 is not res2  # Check that copies are returned to prevent cache corruption

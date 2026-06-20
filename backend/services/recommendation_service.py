@@ -22,7 +22,9 @@ from repositories.restaurant_repository import (
 )
 
 from recommendation.food_tag_module import (
-    extract_food_tags
+    extract_food_tags,
+    expand_food_tags,
+    FALLBACK_MAP
 )
 
 
@@ -67,6 +69,88 @@ class RecommendationService:
             return 2
 
         return 2
+
+    def _score_restaurant(
+        self,
+        restaurant: dict,
+        food_tags: list,
+        taste_tags: list,
+        context_tags: list,
+        weather: str | None,
+        budget: float | None,
+        latitude: float | None,
+        longitude: float | None
+    ) -> dict:
+        weather_relevance = (
+            self.calculate_weather_relevance(
+                weather,
+                restaurant
+            )
+            if weather
+            else None
+        )
+
+        taste_tags_restaurant = (
+            (restaurant.get("taste_tags") or []) 
+            + (restaurant.get("cuisine_type") or [])
+        )
+
+        context_tags_restaurant = (
+            (restaurant.get("context_tags") or []) 
+            + (restaurant.get("style_tags") or []) 
+            + (restaurant.get("environment_tags") or [])
+        )
+
+        learning_score = (
+            self.learner.calculate_learning_score(
+                taste_tags_restaurant
+                +
+                context_tags_restaurant
+            )
+        )
+
+        distance_score = None
+
+        if (
+            latitude is not None
+            and longitude is not None
+            and restaurant.get("latitude") is not None
+            and restaurant.get("longitude") is not None
+        ):
+            distance_score = self.scorer.distance_score(
+                (latitude, longitude),
+                (restaurant["latitude"], restaurant["longitude"])
+            )
+
+        scores = {
+            "food": self.scorer.food_score(
+                food_tags,
+                restaurant.get("food_tags", [])
+            ),
+            "taste": self.scorer.taste_score(
+                taste_tags,
+                taste_tags_restaurant
+            ),
+            "context": self.scorer.context_score(
+                context_tags,
+                context_tags_restaurant
+            ),
+            "price": self.scorer.price_score(
+                budget,
+                restaurant.get("price_lowest")
+            ),
+            "rating": self.scorer.rating_score(
+                restaurant.get("rating")
+            ),
+            "distance": distance_score,
+            "weather": self.scorer.weather_score(
+                weather_relevance
+            ),
+            "learning": learning_score
+        }
+
+        return scores
+
 
     async def get_recommendation(
         self,
@@ -124,173 +208,83 @@ class RecommendationService:
         if RecommendationService._restaurants_cache is None:
             restaurants = await self.repository.get_all_restaurants()
             
-            # ### DEBUG ####
-            # for r in restaurants[:20]:
-            #     print(
-            #         r.get("name"),
-            #         "=>",
-            #         r.get("taste_tags")
-            #     )
-
-            # Sinh food_tags động từ dữ liệu đã có
+            # Sinh food_tags động từ dữ liệu đã có (và mở rộng thêm tag đơn thành phần để khớp fallback)
             for restaurant in restaurants:
-                restaurant["food_tags"] = extract_food_tags(
-                    restaurant["name"]
-                )
-
-                # print(
-                #     restaurant["name"],
-                #     "=>",
-                #     restaurant["food_tags"]
-                # )
+                base_tags = extract_food_tags(restaurant["name"])
+                restaurant["food_tags"] = expand_food_tags(base_tags)
             
             RecommendationService._restaurants_cache = restaurants
         else:
             restaurants = RecommendationService._restaurants_cache
         
-
+        # --- Chiến lược Khớp Chính xác / Fallback ---
+        query_food_tags = features.get("food_tags", [])
+        query_multi_word_tags = [t for t in query_food_tags if t in FALLBACK_MAP]
+        
         scored_restaurants = []
 
-        # ==========================
-        # M5 Scoring
-        # ==========================
+        if query_multi_word_tags:
+            # 1. Tách danh sách nhà hàng thành hai phần: khớp chính xác và khớp một phần (fallback)
+            exact_restaurants = [
+                r for r in restaurants
+                if any(t in (r.get("food_tags") or []) for t in query_multi_word_tags)
+            ]
+            partial_restaurants = [r for r in restaurants if r not in exact_restaurants]
 
-        for restaurant in restaurants:
-
-            # print(
-            #     restaurant["name"],
-            #     restaurant.get("taste_tags")
-            # )
-
-            weather_relevance = (
-                self.calculate_weather_relevance(
-                    weather,
-                    restaurant
+            # 2. Chấm điểm nhóm khớp chính xác (sử dụng tag gốc của truy vấn)
+            scored_exact = []
+            for restaurant in exact_restaurants:
+                scores = self._score_restaurant(
+                    restaurant, query_food_tags, taste_tags, context_tags,
+                    weather, budget, latitude, longitude
                 )
-                if weather
-                else None
-            )
+                final_score = self.scorer.final_score(scores)
+                scored_exact.append({
+                    "restaurant": restaurant,
+                    "score": final_score,
+                    "reason": [self.scorer.explain_recommendation(scores)]
+                })
 
-            taste_tags_restaurant = (
-                (restaurant.get("taste_tags") or []) 
-                + (restaurant.get("cuisine_type") or [])
-            )
+            # 3. Chấm điểm nhóm khớp một phần (chuyển truy vấn thành fallback tags)
+            fallback_tags = []
+            for t in query_food_tags:
+                if t in FALLBACK_MAP:
+                    fallback_tags.extend(FALLBACK_MAP[t])
+                else:
+                    fallback_tags.append(t)
+            fallback_tags = list(set(fallback_tags))
 
-            context_tags_restaurant = (
-                (restaurant.get("context_tags") or []) 
-                + (restaurant.get("style_tags") or []) 
-                + (restaurant.get("environment_tags") or [])
-            )
-
-            learning_score = (
-                self.learner.calculate_learning_score(
-                    taste_tags_restaurant
-                    +
-                    context_tags_restaurant
+            scored_partial = []
+            for restaurant in partial_restaurants:
+                scores = self._score_restaurant(
+                    restaurant, fallback_tags, taste_tags, context_tags,
+                    weather, budget, latitude, longitude
                 )
-            )
+                final_score = self.scorer.final_score(scores)
+                scored_partial.append({
+                    "restaurant": restaurant,
+                    "score": final_score,
+                    "reason": [self.scorer.explain_recommendation(scores)]
+                })
 
-            distance_score = None
+            # 4. Sắp xếp riêng từng nhóm rồi nối lại (đảm bảo khớp chính xác luôn được ưu tiên xếp đầu)
+            scored_exact.sort(key=lambda x: x["score"], reverse=True)
+            scored_partial.sort(key=lambda x: x["score"], reverse=True)
+            scored_restaurants = scored_exact + scored_partial
 
-            if (
-                latitude is not None
-                and longitude is not None
-                and restaurant.get("latitude") is not None
-                and restaurant.get("longitude") is not None
-            ):
-
-                distance_score = self.scorer.distance_score(
-                    (
-                        latitude,
-                        longitude
-                    ),
-                    (
-                        restaurant["latitude"],
-                        restaurant["longitude"]
-                    )
+        else:
+            # Không có nhãn nhiều từ: Chấm điểm toàn bộ nhà hàng bình thường
+            for restaurant in restaurants:
+                scores = self._score_restaurant(
+                    restaurant, query_food_tags, taste_tags, context_tags,
+                    weather, budget, latitude, longitude
                 )
-
-           
-
-            scores = {
-
-                "food":
-                self.scorer.food_score(
-                    features.get("food_tags", []),
-                    restaurant.get("food_tags", [])
-                ),
-
-                "taste":
-                self.scorer.taste_score(
-                    taste_tags,
-                    taste_tags_restaurant
-                ),
-
-                "context":
-                self.scorer.context_score(
-                    context_tags,
-                    context_tags_restaurant
-                ),
-
-                "price":
-                self.scorer.price_score(
-                    budget,
-                    restaurant.get(
-                        "price_lowest"
-                    )
-                ),
-
-                "rating":
-                self.scorer.rating_score(
-                    restaurant.get(
-                        "rating"
-                    )
-                ),
-
-                "distance": 
-                distance_score,
-
-                "weather":
-                self.scorer.weather_score(
-                    weather_relevance
-                ),
-
-                "learning":
-                learning_score
-
-            }
-
-            final_score = (
-                self.scorer.final_score(
-                    scores
-                )
-            )
-
-            ###### DEBUG ##########    
-
-            # print(
-            #     restaurant["name"],
-            #     scores,
-            #     final_score
-            # )
-
-            scored_restaurants.append(
-
-                {
-                    "restaurant":
-                    restaurant,
-
-                    "score":
-                    final_score,
-
-                    "reason":
-                    [
-                        self.scorer.explain_recommendation(
-                            scores
-                        )
-                    ]
-                }
-            )
+                final_score = self.scorer.final_score(scores)
+                scored_restaurants.append({
+                    "restaurant": restaurant,
+                    "score": final_score,
+                    "reason": [self.scorer.explain_recommendation(scores)]
+                })
 
         # ==========================
         # M6 Ranking
