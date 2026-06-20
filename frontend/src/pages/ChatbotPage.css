@@ -46,3 +46,34 @@
   color: var(--error);
   border-color: var(--error);
 }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .chatbot-container {
+    max-width: 100%;
+    padding: 0 var(--space-sm);
+  }
+
+  .chatbot-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-sm);
+  }
+
+  .chatbot-header-text {
+    width: 100%;
+  }
+
+  .clear-chat-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .section-title {
+    font-size: var(--font-lg);
+  }
+
+  .chatbot-hint {
+    font-size: var(--font-xs);
+  }
+}

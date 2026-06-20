@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useTheme } from '../hooks/useTheme';
@@ -8,6 +9,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (location.pathname === '/login') return null;
 
@@ -28,15 +30,26 @@ export default function Navbar() {
       <div className="navbar-inner container">
         <Link to="/" className="navbar-brand">
           <span className="navbar-logo">🍽️</span>
-          <span className="navbar-title">SmartFood</span>
+          <span className="navbar-title">Foođi</span>
         </Link>
 
-        <div className="navbar-links">
+        <button 
+          className="hamburger-menu"
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
+          <span className={`hamburger-line ${isMobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`hamburger-line ${isMobileMenuOpen ? 'open' : ''}`}></span>
+          <span className={`hamburger-line ${isMobileMenuOpen ? 'open' : ''}`}></span>
+        </button>
+
+        <div className={`navbar-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
           {navLinks.map((link) => (
             <Link
               key={link.path}
               to={link.path}
               className={`navbar-link ${location.pathname === link.path ? 'active' : ''}`}
+              onClick={() => setIsMobileMenuOpen(false)}
             >
               <span className="navbar-link-icon">{link.icon}</span>
               <span className="navbar-link-label">{link.label}</span>

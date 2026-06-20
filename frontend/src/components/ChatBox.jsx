@@ -29,8 +29,10 @@ export default function ChatBox({ messages, onSend, isFavorite, onToggleFavorite
           >
             <div className="chatbox-bubble">
               {msg.role === 'assistant' && <span className="chatbox-avatar">🤖</span>}
-              <div className="chatbox-text">
-                <div>{msg.content}</div>
+              <div className="chatbox-content">
+                <div className="chatbox-text">
+                  <div>{msg.content}</div>
+                </div>
                 {msg.restaurants && msg.restaurants.length > 0 && (
                   <div className="chatbox-restaurants">
                     {msg.restaurants.map((res) => (
@@ -58,7 +60,7 @@ export default function ChatBox({ messages, onSend, isFavorite, onToggleFavorite
           type="text"
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Hỏi SmartFood AI... (vd: quán cay ngon giá rẻ)"
+          placeholder="Hỏi Foođi AI... (vd: quán cay ngon giá rẻ)"
           autoFocus
         />
         <button type="submit" className="btn btn-primary chatbox-send" disabled={!input.trim()}>

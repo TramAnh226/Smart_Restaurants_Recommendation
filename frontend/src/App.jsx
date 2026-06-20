@@ -9,52 +9,75 @@ import FavoritesPage from './pages/FavoritesPage';
 import ProfilePage from './pages/ProfilePage';
 import ChatbotPage from './pages/ChatbotPage';
 import RestaurantDetailPage from './pages/RestaurantDetailPage';
+import MapPage from './pages/MapPage';
 
 export default function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
-          <Navbar />
           <Routes>
             <Route path="/login" element={<LoginPage />} />
             <Route
               path="/"
               element={
-                <ProtectedRoute>
-                  <HomePage />
-                </ProtectedRoute>
+                <>
+                  <Navbar />
+                  <ProtectedRoute>
+                    <HomePage />
+                  </ProtectedRoute>
+                </>
               }
             />
             <Route
               path="/favorites"
               element={
-                <ProtectedRoute>
-                  <FavoritesPage />
-                </ProtectedRoute>
+                <>
+                  <Navbar />
+                  <ProtectedRoute>
+                    <FavoritesPage />
+                  </ProtectedRoute>
+                </>
               }
             />
             <Route
               path="/profile"
               element={
-                <ProtectedRoute>
-                  <ProfilePage />
-                </ProtectedRoute>
+                <>
+                  <Navbar />
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                </>
               }
             />
             <Route
               path="/chat"
               element={
-                <ProtectedRoute>
-                  <ChatbotPage />
-                </ProtectedRoute>
+                <>
+                  <Navbar />
+                  <ProtectedRoute>
+                    <ChatbotPage />
+                  </ProtectedRoute>
+                </>
               }
             />
             <Route
               path="/restaurant/:id"
               element={
+                <>
+                  <Navbar />
+                  <ProtectedRoute>
+                    <RestaurantDetailPage />
+                  </ProtectedRoute>
+                </>
+              }
+            />
+            <Route
+              path="/map/:lat/:lng/:name"
+              element={
                 <ProtectedRoute>
-                  <RestaurantDetailPage />
+                  <MapPage />
                 </ProtectedRoute>
               }
             />

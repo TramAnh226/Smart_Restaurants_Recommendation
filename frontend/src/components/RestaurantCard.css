@@ -6,6 +6,64 @@
   transition: all var(--transition-base);
 }
 
+/* Mobile responsive - show more cards on smaller screens */
+@media (max-width: 768px) {
+  .restaurant-card {
+    min-width: 200px;
+    max-width: 240px;
+  }
+
+  .rc-image-wrapper {
+    height: 140px;
+  }
+
+  .rc-name {
+    font-size: var(--font-sm);
+  }
+
+  .rc-meta {
+    font-size: var(--font-xs);
+  }
+
+  .rc-tags {
+    gap: 2px;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .restaurant-card {
+    min-width: 160px;
+    max-width: 180px;
+  }
+
+  .rc-image-wrapper {
+    height: 120px;
+  }
+
+  .rc-content {
+    padding: var(--space-sm);
+  }
+
+  .rc-name {
+    font-size: var(--font-xs);
+    -webkit-line-clamp: 1;
+  }
+
+  .rc-meta {
+    gap: var(--space-sm);
+  }
+
+  .rc-reason-pill {
+    font-size: 0.6rem;
+    padding: 2px 6px;
+  }
+}
+
 .restaurant-card:hover {
   transform: translateY(-4px);
   box-shadow: var(--card-shadow-hover);

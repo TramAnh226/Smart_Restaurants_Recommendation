@@ -10,6 +10,20 @@
   scroll-snap-type: x mandatory;
 }
 
+/* Mobile responsive - reduce gap to show more cards */
+@media (max-width: 768px) {
+  .rec-carousel-scroll {
+    gap: var(--space-md);
+  }
+}
+
+@media (max-width: 480px) {
+  .rec-carousel-scroll {
+    gap: var(--space-sm);
+    padding-bottom: var(--space-sm);
+  }
+}
+
 /* Tùy chỉnh thanh cuộn ngang cho đẹp (tùy chọn) */
 .rec-carousel-scroll::-webkit-scrollbar {
   height: 8px;

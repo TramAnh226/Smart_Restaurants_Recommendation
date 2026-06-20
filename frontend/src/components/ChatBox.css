@@ -13,6 +13,7 @@
 .chatbox-messages {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: var(--space-lg);
   display: flex;
   flex-direction: column;
@@ -38,6 +39,28 @@
   max-width: 80%;
 }
 
+.chatbox-bubble:has(.chatbox-restaurants) {
+  max-width: 95%;
+}
+
+.chatbox-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+.chatbox-message:has(.chatbox-restaurants) {
+  flex-direction: column;
+  align-items: flex-start;
+  width: 100%;
+  max-width: 100%;
+}
+
+.chatbox-message:has(.chatbox-restaurants).assistant {
+  align-items: flex-start;
+}
+
 .chatbox-avatar {
   font-size: 1.5rem;
   flex-shrink: 0;
@@ -50,6 +73,7 @@
   font-size: var(--font-sm);
   line-height: 1.5;
   animation: fadeIn var(--transition-base) ease-out;
+  overflow-x: hidden;
 }
 
 .chatbox-message.assistant .chatbox-text {
@@ -87,11 +111,35 @@
 .chatbox-restaurants {
   display: flex;
   overflow-x: auto;
+  overflow-y: hidden;
   gap: var(--space-md);
   padding: var(--space-sm) var(--space-xs);
   margin-top: var(--space-md);
   scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+  -webkit-overflow-scrolling: touch;
   width: 100%;
+  flex-shrink: 0;
+}
+
+/* Horizontal scrollbar styling - webkit browsers */
+.chatbox-restaurants::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+.chatbox-restaurants::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.chatbox-restaurants::-webkit-scrollbar-thumb {
+  background: rgba(156, 163, 175, 0.5);
+  border-radius: 3px;
+}
+
+.chatbox-restaurants::-webkit-scrollbar-thumb:hover {
+  background: rgba(156, 163, 175, 0.8);
 }
 
 .chatbox-restaurants .restaurant-card {
@@ -100,5 +148,46 @@
   max-width: 240px;
   flex-shrink: 0;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  height: fit-content;
 }
 
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .chatbox {
+    min-height: 300px;
+    max-height: calc(100vh - 180px);
+  }
+
+  .chatbox-messages {
+    padding: var(--space-md);
+  }
+
+  .chatbox-bubble {
+    max-width: 90%;
+  }
+
+  .chatbox-text {
+    font-size: var(--font-xs);
+    padding: var(--space-sm);
+  }
+
+  .chatbox-restaurants .restaurant-card {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+  }
+
+  .chatbox-input-form {
+    padding: var(--space-sm);
+  }
+
+  .chatbox-send {
+    padding: var(--space-sm) var(--space-md);
+  }
+
+  .chatbox-restaurants .restaurant-card {
+    width: 200px;
+    min-width: 200px;
+    max-width: 200px;
+  }
+}

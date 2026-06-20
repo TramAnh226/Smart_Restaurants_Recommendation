@@ -51,7 +51,7 @@ export default function ChatbotPage() {
         {
           id: 1,
           role: 'assistant',
-          content: 'Xin chào! Mình là SmartFood AI. Bạn muốn ăn gì hôm nay? Mô tả sở thích để mình gợi ý quán nhé!',
+          content: 'Xin chào! Mình là Foođi AI. Bạn muốn ăn gì hôm nay? Mô tả sở thích để mình gợi ý quán nhé!',
         },
       ];
     } catch (e) {
@@ -59,7 +59,7 @@ export default function ChatbotPage() {
         {
           id: 1,
           role: 'assistant',
-          content: 'Xin chào! Mình là SmartFood AI. Bạn muốn ăn gì hôm nay? Mô tả sở thích để mình gợi ý quán nhé!',
+          content: 'Xin chào! Mình là Foođi AI. Bạn muốn ăn gì hôm nay? Mô tả sở thích để mình gợi ý quán nhé!',
         },
       ];
     }
@@ -191,7 +191,7 @@ export default function ChatbotPage() {
                     {
                       id: 1,
                       role: 'assistant',
-                      content: 'Xin chào! Mình là SmartFood AI. Bạn muốn ăn gì hôm nay? Mô tả sở thích để mình gợi ý quán nhé!',
+                      content: 'Xin chào! Mình là Foođi AI. Bạn muốn ăn gì hôm nay? Mô tả sở thích để mình gợi ý quán nhé!',
                     },
                   ]);
                 }

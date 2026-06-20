@@ -73,7 +73,7 @@ export default function LoginPage() {
       <div className="login-card animate-slide-up">
         <div className="login-header">
           <span className="login-logo">🍽️</span>
-          <h1 className="login-title">SmartFood</h1>
+          <h1 className="login-title">Foođi</h1>
           <p className="login-subtitle">
             {isLogin ? 'Đăng nhập để khám phá quán ăn phù hợp' : 'Tạo tài khoản mới'}
           </p>

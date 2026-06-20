@@ -203,7 +203,15 @@ export default function RestaurantDetailPage() {
         {/* OpenStreetMap via Leaflet */}
         {restaurant.latitude && restaurant.longitude && (
           <div className="detail-section card">
-            <h2 className="detail-section-title">📍 Vị trí trên bản đồ</h2>
+            <div className="detail-section-header">
+              <h2 className="detail-section-title">📍 Vị trí trên bản đồ</h2>
+              <Link
+                to={`/map/${restaurant.latitude}/${restaurant.longitude}/${encodeURIComponent(restaurant.name)}`}
+                className="btn btn-secondary fullscreen-map-btn"
+              >
+                🗺️ Mở bản đồ toàn màn hình
+              </Link>
+            </div>
             <MapView
               lat={restaurant.latitude}
               lng={restaurant.longitude}
