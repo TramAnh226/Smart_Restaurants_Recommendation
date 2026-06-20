@@ -1,0 +1,154 @@
+Input: Cuối tuần rủ lũ bạn ra vỉa hè làm tí xiên bẩn chém gió là nhất.
+Preprocess: cuối tuần rủ lũ bạn ra vỉa hè làm tí xiên bẩn chém gió là nhất .
+Output:
+{
+    "taste_tags": [],
+    "context_tags": [
+        "casual"
+    ],
+    "style_tags": [
+        "street_food"
+    ],
+    "environment_tags": [
+        "outdoor"
+    ],
+    "cuisine_type": []
+}
+----------------------------------------
+
+Input: Mình đi 2 người gọi 1 bát phở bò và 1 phần gỏi cuốn, nước dùng ngọt thanh từ xương.
+Preprocess: mình đi 2 người gọi 1 bát phở bò và 1 phần gỏi cuốn , nước dùng ngọt thanh từ xương .
+Output:
+{
+    "taste_tags": [
+        "sweet",
+        "umami"
+    ],
+    "context_tags": [
+        "date"
+    ],
+    "style_tags": [],
+    "environment_tags": [],
+    "cuisine_type": [
+        "vietnamese"
+    ]
+}
+----------------------------------------
+
+Input: Buffet nướng BBQ ở đây đồ hải sản tươi rói, không gian sang trọng.
+Preprocess: buffet nướng bbq ở đây đồ hải sản tươi rói , không gian sang trọng .
+Output:
+{
+    "taste_tags": [
+        "fresh"
+    ],
+    "context_tags": [],
+    "style_tags": [
+        "fine_dining",
+        "buffet"
+    ],
+    "environment_tags": [],
+    "cuisine_type": []
+}
+----------------------------------------
+
+Input: Quán cf này view sân thượng đỉnh chóp, giá sinh viên hạt dẻ.
+Preprocess: quán cf này view sân thượng đỉnh chóp , giá sinh viên hạt dẻ .
+Output:
+{
+    "taste_tags": [],
+    "context_tags": [
+        "student_friendly"
+    ],
+    "style_tags": [
+        "cafe",
+        "rooftop"
+    ],
+    "environment_tags": [
+        "rooftop"
+    ],
+    "cuisine_type": []
+}
+----------------------------------------
+
+Input: Nước lẩu thái chua cay chuẩn vị, tôm mực béo ngậy.
+Preprocess: nước lẩu thái chua cay chuẩn vị , tôm mực béo ngậy .
+Output:
+{
+    "taste_tags": [
+        "spicy",
+        "sour",
+        "creamy"
+    ],
+    "context_tags": [],
+    "style_tags": [],
+    "environment_tags": [],
+    "cuisine_type": [
+        "thai"
+    ]
+}
+----------------------------------------
+
+Input: Menu thuần chay, đồ ăn healthy thanh tịnh, phù hợp cho người lớn tuổi.
+Preprocess: menu thuần chay , đồ ăn healthy thanh tịnh , phù hợp cho người lớn tuổi .
+Output:
+{
+    "taste_tags": [
+        "light"
+    ],
+    "context_tags": [
+        "family"
+    ],
+    "style_tags": [],
+    "environment_tags": [],
+    "cuisine_type": []
+}
+----------------------------------------
+
+Input: Hàng không cay nhé, vì mình không thích ăn ớt.
+Preprocess: hàng không cay nhé , vì mình không thích ăn ớt .
+Output:
+{
+    "taste_tags": [
+        "spicy"
+    ],
+    "context_tags": [],
+    "style_tags": [],
+    "environment_tags": [],
+    "cuisine_type": []
+}
+----------------------------------------
+
+Input: Tôi muốn tìm quán đồ Hoa ngon lành ở quận 5.
+Preprocess: tôi muốn tìm quán đồ hoa ngon lành ở quận 5 .
+Output:
+{
+    "taste_tags": [],
+    "context_tags": [],
+    "style_tags": [
+        "restaurant"
+    ],
+    "environment_tags": [],
+    "cuisine_type": [
+        "chinese"
+    ]
+}
+----------------------------------------
+
+Input: Ăn steak hay pizza kiểu Ý ngon sang chảnh ở đâu nhỉ?
+Preprocess: ăn steak hay pizza kiểu ý ngon sang chảnh ở đâu nhỉ ?
+Output:
+{
+    "taste_tags": [],
+    "context_tags": [],
+    "style_tags": [
+        "fine_dining"
+    ],
+    "environment_tags": [],
+    "cuisine_type": [
+        "western",
+        "italian"
+    ]
+}
+----------------------------------------
+
