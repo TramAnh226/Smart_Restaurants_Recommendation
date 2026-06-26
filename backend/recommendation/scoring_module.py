@@ -198,35 +198,34 @@ class RecommendationScorer:
         reasons = []
 
         if (scores.get("food") or 0) >= 8:
-            reasons.append("matches the food you are looking for")
+            reasons.append("có món ăn phù hợp")
 
         if (scores.get("taste") or 0) >= 8:
-            reasons.append("matches your taste")
+            reasons.append("hợp khẩu vị")
 
         price_score = scores.get("price") or 0
         if price_score >= 8:
-            reasons.append("fits your budget")
+            reasons.append("hợp túi tiền")
 
         if (scores.get("distance") or 0) >= 8:
-            reasons.append("is nearby")
+            reasons.append("gần bạn")
 
         if (scores.get("context") or 0) >= 8:
-            reasons.append("fits your current context")
+            reasons.append("phù hợp ngữ cảnh hiện tại")
 
         if scores.get("rating", 0) >= 8:
-            reasons.append("has strong ratings")
+            reasons.append("có đánh giá tốt")
 
         if (scores.get("weather") or 0) >= 8:
-            reasons.append("matches current weather")
+            reasons.append("phù hợp thời tiết hiện tại")
 
         if (scores.get("learning") or 0) >= 8:
-            reasons.append("aligns with your past behavior")
+            reasons.append("dựa trên sở thích của bạn")
 
         if not reasons:
-            return "Balanced recommendation."
+            return "Đề xuất hợp lý."
 
-        return "Recommended because it " + ", ".join(reasons) + "."
-
+        return "Đề xuất bởi vì: " + ", ".join(reasons) + "."
 
 
 if __name__ == "__main__":
