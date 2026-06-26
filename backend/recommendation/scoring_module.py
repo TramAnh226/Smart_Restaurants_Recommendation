@@ -152,30 +152,30 @@ class RecommendationScorer:
             return None
 
         # Định nghĩa điểm cho từng loại tag
-        exact_tags = {"pho_ga", "pho_bo", "bun_bo_hue", "com_tam", "lau_thai", "lau_bo", "ga_ran", "ga_nuong"}
-        main_dish_tags = {"pho", "bun", "lau", "com_tam", "pizza", "sushi", "milk_tea", "che", "burger"}
-        modifier_tags = {"bo", "ga"}
+        exact_tags = {"pho_ga", "pho_bo", "bun_bo_hue", "com_tam", "lau_thai", "lau_bo", "ga_ran", "ga_nuong", "chay", "coffee", "ca_phe", "an_vat", "tra_sua", "mi_cay", "mi", "hu_tieu", "do_uong", "banh_ngot", "do_song", "do_nuong", "tuoi_song"}
+        main_dish_tags = {"pho", "bun", "lau", "com_tam", "pizza", "sushi", "milk_tea", "che", "burger", "chay", "mi", "hu tieu", "banh", "kem"}
+        modifier_tags = {"bo", "ga", "hai_san"}
 
         # Kiểm tra khớp chính xác trước (Exact Match)
         common_exact = set(query_food_tags) & set(restaurant_food_tags) & exact_tags
         if common_exact:
-            return 20.0
+            return 10.0
 
         # Khớp một phần (Partial Match)
         score = 0.0
         matched = set(query_food_tags) & set(restaurant_food_tags)
         for tag in matched:
             if tag in exact_tags:
-                score += 20.0
+                score += 10.0
             elif tag in main_dish_tags:
-                score += 5.0
+                score += 2.5
             elif tag in modifier_tags:
-                score += 2.0
+                score += 1.0
             else:
-                score += 5.0  # Mặc định cho các tag khác nếu có
+                score += 2.5  # Mặc định cho các tag khác nếu có
 
         # Giới hạn điểm số tối đa là 20.0
-        return min(score, 20.0)
+        return min(score, 10.0)
 
     # ----------------------------
     # Final Score
@@ -198,35 +198,34 @@ class RecommendationScorer:
         reasons = []
 
         if (scores.get("food") or 0) >= 8:
-            reasons.append("matches the food you are looking for")
+            reasons.append("có món ăn phù hợp")
 
         if (scores.get("taste") or 0) >= 8:
-            reasons.append("matches your taste")
+            reasons.append("hợp khẩu vị")
 
         price_score = scores.get("price") or 0
         if price_score >= 8:
-            reasons.append("fits your budget")
+            reasons.append("hợp túi tiền")
 
         if (scores.get("distance") or 0) >= 8:
-            reasons.append("is nearby")
+            reasons.append("gần bạn")
 
         if (scores.get("context") or 0) >= 8:
-            reasons.append("fits your current context")
+            reasons.append("phù hợp ngữ cảnh hiện tại")
 
         if scores.get("rating", 0) >= 8:
-            reasons.append("has strong ratings")
+            reasons.append("có đánh giá tốt")
 
         if (scores.get("weather") or 0) >= 8:
-            reasons.append("matches current weather")
+            reasons.append("phù hợp thời tiết hiện tại")
 
         if (scores.get("learning") or 0) >= 8:
-            reasons.append("aligns with your past behavior")
+            reasons.append("dựa trên sở thích của bạn")
 
         if not reasons:
-            return "Balanced recommendation."
+            return "Đề xuất hợp lý."
 
-        return "Recommended because it " + ", ".join(reasons) + "."
-
+        return "Đề xuất bởi vì: " + ", ".join(reasons) + "."
 
 
 if __name__ == "__main__":

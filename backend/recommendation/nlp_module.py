@@ -313,6 +313,37 @@ def extract_features(text: str) -> Dict:
     # Chiết xuất food_tags động từ văn bản gốc
     features["food_tags"] = extract_food_tags(text)
 
+    cold_keywords = [
+        "mát lạnh",
+        "giải khát",
+        "mat lanh",
+        "giai khat"
+    ]
+
+    if any(kw in text for kw in cold_keywords):
+        current_tags = set(features["food_tags"])
+
+        current_tags.add("ca_phe")
+        current_tags.add("milk_tea")
+
+        features["food_tags"] = list(current_tags)
+
+    hot_keywords = [
+        "ấm áp",
+        "ấm người",
+        "nóng",
+        "ấm bụng"
+    ]
+
+    if any(kw in text for kw in hot_keywords):
+        current_tags = set(features["food_tags"])
+
+        current_tags.add("lau")
+        current_tags.add("pho")
+        current_tags.add("do_nuong")
+
+        features["food_tags"] = list(current_tags)
+
     # Lưu bản sao vào cache
     _extraction_cache[text] = {k: list(v) for k, v in features.items()}
 
@@ -346,6 +377,38 @@ async def extract_features_async(text: str) -> Dict:
 
     # Chiết xuất food_tags động từ văn bản gốc
     features["food_tags"] = extract_food_tags(text)
+
+    cold_keywords = [
+        "mát lạnh",
+        "giải khát",
+        "mat lanh",
+        "giai khat"
+    ]
+
+    if any(kw in text for kw in cold_keywords):
+        current_tags = set(features["food_tags"])
+
+        current_tags.add("ca_phe")
+        current_tags.add("milk_tea")
+
+        features["food_tags"] = list(current_tags)
+
+    
+    hot_keywords = [
+        "ấm áp",
+        "ấm người",
+        "nóng",
+        "ấm bụng"
+    ]
+
+    if any(kw in text for kw in hot_keywords):
+        current_tags = set(features["food_tags"])
+
+        current_tags.add("lau")
+        current_tags.add("pho")
+        current_tags.add("do_nuong")
+
+        features["food_tags"] = list(current_tags)
 
     # Lưu bản sao vào cache
     _extraction_cache[text] = {k: list(v) for k, v in features.items()}

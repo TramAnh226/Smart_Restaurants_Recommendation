@@ -91,7 +91,7 @@ export default function AdvancedFilterModal({ isOpen, onClose, onApply, initialF
           </div>
 
           <div className="filter-group">
-            <label>📍 Khoảng cách tối đa: {filters.maxDistance < 20 ? `${filters.maxDistance} km` : 'Tất cả'}</label>
+            <label>📍 Khoảng cách: {filters.maxDistance < 20 ? `${filters.maxDistance} km` : 'Tất cả'}</label>
             <input
               type="range"
               min="1"
