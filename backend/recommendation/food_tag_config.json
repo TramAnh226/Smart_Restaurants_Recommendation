@@ -1,3 +1,5 @@
+
+
 {
   "pho_ga": [
     "phở gà",
@@ -43,6 +45,10 @@
     "lẩu",
     "lau"
   ],
+  "chay": [
+    "chay",
+    "chay"
+  ],
   "bo": [
     "bò",
     "bo"
@@ -56,11 +62,13 @@
     "pizza"
   ],
   "sushi": [
-    "sushi"
+    "sushi",
+    "sashimi"
   ],
   "milk_tea": [
     "trà sữa",
-    "milk tea"
+    "milk tea",
+    "tra sua"
   ],
   "che": [
     "chè",
@@ -69,5 +77,63 @@
   "burger": [
     "hamburger",
     "burger"
+  ],
+  "ca_phe": [
+    "coffee",
+    "cà phê",
+    "ca phe"
+  ],
+  "an_vat": [
+    "ăn vặt",
+    "an vat"
+  ],
+  "do_nuong": [
+    "BBQ",
+    "đồ nướng",
+    "do nuong"
+  ],
+  "hu_tieu": [
+    "hủ tiếu",
+    "hủ tíu",
+    "hu tieu",
+    "hu tiu"
+  ],
+  "nuoc": [
+    "nước",
+    "coffee",
+    "cà phê",
+    "ca phe",
+    "cafe",
+    "milk tea",
+    "trà sữa",
+    "tra sua"
+  ],
+  "do_song": [
+    "sushi",
+    "sashimi",
+    "đồ sống",
+    "tươi sống"
+  ],
+  "banh_ngot": [
+    "bakery",
+    "đồ ngọt",
+    "banh ngot"
+  ],
+  "kem": [
+    "gelato",
+    "cream",
+    "kem"
+  ],
+  "tuoi_song": [
+    "sushi",
+    "sashimi"
+  ],
+  "mi": [
+    "mì cay",
+    "mỳ cay",
+    "mi",
+    "mì"
   ]
 }
+
+
